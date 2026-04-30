@@ -1,0 +1,22 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.action {
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: #eaeaea;
+  margin: 4px;
+  padding: 8px 12px;
+  font: inherit;
+  border-radius: 4px;
+
+  &:hover,
+  &:focus {
+    background: #ddd;
+    outline: none;
+    border-color: #999;
+  }
+}

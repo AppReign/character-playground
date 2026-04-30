@@ -1,0 +1,48 @@
+.partList {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+  margin: 25px 0;
+}
+
+.partItemWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2px;
+  max-width: 80px;
+}
+
+.partItem {
+  border: 2px solid #eaeaea;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 25px;
+  background: #eaeaea;
+  position: relative;
+  line-height: 40px;
+}
+
+.partItemLabel {
+  font-size: 10px;
+  line-height: 1.2;
+  margin-top: 4px;
+  word-break: break-word;
+  color: #333;
+}
+
+.partItemSelected {
+  @extend .partItem;
+
+  &:before {
+    border: 2px solid #bfbcbc;
+    content: "";
+    border-radius: 50%;
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+  }
+}

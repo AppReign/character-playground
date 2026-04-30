@@ -1,0 +1,13 @@
+.EquipmentSelector {
+  display: grid;
+  height: 100%;
+  align-self: baseline;
+  grid-template-columns: minmax(250px, 450px);
+  grid-template-rows: min-content min-content auto;
+}
+
+.EquipmentSelectorTitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}

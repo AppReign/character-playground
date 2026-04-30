@@ -1,0 +1,13 @@
+---
+description: Do not reorganize EQUIPMENT layer map in equipmentLayer.ts without explicit user request
+globs: src/config/equipmentLayer.ts
+alwaysApply: true
+---
+
+# `equipmentLayer.ts` — structure is frozen by default
+
+- **Do not** rename, move, nest, unnest, merge, split, or reorder keys under `export const EQUIPMENT` unless the user **explicitly** asks to change that organization (e.g. “move X under Y”, “flatten Z”).
+- **Allowed without asking**: fix **typos**, **string literal values** that must match `zIndex` keys, **imports** elsewhere, or **TypeScript errors** that only require adjusting a **leaf** string (same shape).
+- If a task would require reorganizing `EQUIPMENT`, **stop** and ask the user to confirm, or implement the change only in other files (`zIndex.ts`, POCs) without touching the tree shape in `equipmentLayer.ts`.
+
+This file’s nested layout (`CHEST`, top-level `OFFHAND` / `MAINHAND`, `ONE_HANDED.CROSSBOW`, etc.) is **intentional** and must stay as-is unless overridden here by the user.
