@@ -1,39 +1,77 @@
 # Dragons of the Void — Character Playground
 
-React app for previewing 2D character layers: **base body** (M01) plus **equipment** from item definitions, with z-order from `zIndex` and named layer maps (`EQUIPMENT`, `BODY`).
+Small React app for previewing a 2D character built from layered PNGs (base body + equipment).
 
-Live site: [dragonsofthevoid.com](https://dragonsofthevoid.com/) (see `homepage` in `package.json`).
+## Quick start (first time)
 
-## Assets
+### 1) Install Node.js + npm
 
-PNG layers live under `public/character_parts/` (and subfolders per set). The app resolves URLs like `/character_parts/<filename>.png` via `src/utils/imageSrcResolver.ts`.
+- **Recommended (Mac/Linux)**: install **nvm** (Node Version Manager), then install Node:
 
-## Configuration
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+nvm install --lts
+nvm use --lts
+node -v
+npm -v
+```
 
-- **`src/config.ts`** — wires `partTypes` and `parts` into the main `Config`.
-- **`src/config/partTypes.ts`** — part categories shown in the UI.
-- **`src/config/parts.ts`** — combines **`partsBase`** (base body) and **`allEquipmentItems`** (equipment catalog).
-- **`src/config/baseLayer.ts`** — `BODY` layer ids for base sprites (paired with `zIndex`).
-- **`src/config/equipmentLayer.ts`** — `EQUIPMENT` layer ids for equipped gear.
-- **`src/config/zIndex.ts`** — numeric draw order for each layer key.
-- **`src/interfaces/Config.ts`** — types for parts, images, equipment POC rows.
+- **Windows**: install the **LTS** Node.js installer from `https://nodejs.org/`, then confirm:
 
-Equipment item data is split under `src/equipment/` and aggregated in `src/config/allEquipmentItems.ts`.
+```bash
+node -v
+npm -v
+```
 
-## Scripts
+### 2) Clone the repo and install dependencies
 
-### `npm start`
+```bash
+git clone <REPO_URL_HERE>
+cd character
+npm install
+```
 
-Runs the app in development. Open [http://localhost:3000](http://localhost:3000). The page reloads when you edit source files.
+### 3) Run the app
 
-### `npm run build`
+```bash
+npm start
+```
 
-Produces an optimized bundle in the `build/` folder (CRA). Static files from `public/` are copied into `build/`.
+Then open `http://localhost:3000`.
 
-### `npm run deploy`
+## Staying up to date (simple rebase workflow)
 
-Runs `npm run build` then publishes `build/` with `gh-pages`. Adjust or remove if your hosting setup differs.
+If you have local changes, either **commit** them (recommended) or **stash** them before updating.
 
-### `npm test`
+To update your local copy from `master`:
 
-Runs the test watcher (React Testing Library / Jest).
+```bash
+git fetch origin
+git rebase origin/master
+```
+
+If you get conflicts: fix the files, then:
+
+```bash
+git add .
+git rebase --continue
+```
+
+To abandon the rebase:
+
+```bash
+git rebase --abort
+```
+
+## Where the assets live
+
+- **PNGs**: `public/character_parts/…`
+- The app loads images by URL like `/character_parts/<filename>.png` (see `src/utils/imageSrcResolver.ts`).
+
+## Useful scripts
+
+```bash
+npm start      # dev server
+npm run build  # production build (outputs to build/)
+npm test       # tests
+```
