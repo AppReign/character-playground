@@ -1,0 +1,35 @@
+.header {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 18, 28, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.nav {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.65rem 1.25rem;
+  align-items: center;
+}
+
+.link {
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.linkActive {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}

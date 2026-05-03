@@ -2,9 +2,21 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(400px, 1fr) 1fr;
-  grid-template-rows: 100vh;
+  grid-template-rows: 1fr;
   align-items: center;
   margin: 0 25px;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.playgroundRoot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
 }
 
 .Selectors {
