@@ -48,15 +48,16 @@ export function pickRandomEquipmentLoadout(
   const catalog = allEquipmentItems;
   const picks: ConfigPartEquipment[] = [];
 
-  const mainCandidates = catalog.filter((part) => part.equipSlot === "mainHand");
+  const mainCandidates = catalog.filter((part) => part.equipSlot === "main-hand");
   const main = pickOrSkip(mainCandidates, p);
   if (main) picks.push(main);
 
   const mainIs2h =
-    main != null && isTwoHandedWeaponPose(main.pose);
+    main != null &&
+    (main.twoHanded === true || isTwoHandedWeaponPose(main.pose));
 
   if (!mainIs2h) {
-    const offCandidates = catalog.filter((part) => part.equipSlot === "offHand");
+    const offCandidates = catalog.filter((part) => part.equipSlot === "off-hand");
     const offSafe = offCandidates.filter(
       (part) => !isTwoHandedWeaponPose(part.pose)
     );
@@ -71,7 +72,7 @@ export function pickRandomEquipmentLoadout(
   }
 
   for (const slot of ARMOR_SLOTS) {
-    const options = getEquipmentPartsForSlot(slot, catalog);
+    const options = getEquipmentPartsForSlot(slot, catalog, picks);
     const choice = pickOrSkip(options, p);
     if (choice) picks.push(choice);
   }

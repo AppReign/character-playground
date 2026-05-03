@@ -1,23 +1,17 @@
-import { ItemEquip } from "../interfaces/Config";
-import { configPoc as crossbowsPoc } from "../equipment/testWeapons";
-import { configPoc as plainFarmerPoc } from "../equipment/plainFarmer";
-import { configPoc as mirayPoc } from "../equipment/miray";
-import { configPoc as bassinianWarderPoc } from "../equipment/bassinianWarder";
-import { configPoc as conquerorPoc } from "../equipment/conqueror";
-import { buildEquipmentCatalog } from "./equipmentFromPoc";
+import type { ItemEquip } from "../interfaces/Config";
+import {
+  equipmentRegistry as equipmentRegistryData,
+  equipmentSetBundles
+} from "../data/equipmentRegistry";
+import { buildEquipmentCatalog } from "./equipmentDisplay";
 
-/** Merged registry of all pose-keyed equipment definitions. */
-export const equipmentPocRegistry: Record<string, ItemEquip> = {
-  ...crossbowsPoc,
-  ...plainFarmerPoc,
-  ...mirayPoc,
-  ...bassinianWarderPoc,
-  ...conquerorPoc
-};
+/** Merged registry of all equipment definitions (`src/data/equipmentRegistry.ts`). */
+export const equipmentRegistry: Record<string, ItemEquip> = equipmentRegistryData;
 
 /**
- * Full equipment catalog for the selector and merge-with-config (built from `configPoc` per set).
+ * Drawable equipment catalog for the selector and merge-with-config
+ * (items without `characterDisplay` are omitted until art is added).
  */
-const allEquipmentItems = buildEquipmentCatalog(equipmentPocRegistry);
+const allEquipmentItems = buildEquipmentCatalog([...equipmentSetBundles]);
 
 export default allEquipmentItems;

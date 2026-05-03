@@ -1,18 +1,17 @@
 import { ConfigPart } from "../interfaces/Config";
-import { Pose } from "../interfaces/Config";
 import { BODY } from "./baseLayer";
+import {
+  deriveBaseArmBundlePoses,
+  type EquipmentHandPose
+} from "../utils/equipmentPose";
 
-
-export const getBaseCharacterAssets = ({mainHandPose, offHandPose}: {mainHandPose: Pose, offHandPose: Pose}) => {
+export const getBaseCharacterAssets = (pose: EquipmentHandPose) => {
   const baseAssets = [...partsBaseBody];
-  if (mainHandPose) {
-    baseAssets.push(...partsBaseArms.filter(part => part.pose === mainHandPose));
-  }
-  if (offHandPose) {
-    baseAssets.push(...partsBaseArms.filter(part => part.pose === offHandPose));
-  }
+  const [armPoseA, armPoseB] = deriveBaseArmBundlePoses(pose);
+  baseAssets.push(...partsBaseArms.filter((part) => part.pose === armPoseA));
+  baseAssets.push(...partsBaseArms.filter((part) => part.pose === armPoseB));
   return baseAssets;
-}
+};
 
 /**
  * Base character parts: face/body, hair, bare chest, base pants/foot.

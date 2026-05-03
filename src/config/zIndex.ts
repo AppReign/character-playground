@@ -53,7 +53,7 @@ export const zIndex = {
   [EQUIPMENT.OFFHAND.ONE_HANDED.SHIELD.UNDER]: 510
 } as const;
 
-/** Semantic layer id (matches keys of `zIndex`). Equipment POC rows reference this; numbers resolve at build time. */
+/** Semantic layer id (matches keys of `zIndex`). Equipment image rows reference this; numbers resolve at build time. */
 export type ZIndexLayerKey = keyof typeof zIndex;
 
 export function zIndexValue(layer: ZIndexLayerKey): number {

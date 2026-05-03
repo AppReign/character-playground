@@ -1,12 +1,18 @@
-export type EquipSlot = 'mainHand' | 'offHand' | 'helm' | 'chest' | 'pants' | 'boots';
+/** Single source of truth for slot ids and the `EquipSlot` union (production-style strings). */
+export const EQUIP_SLOTS = [
+  "helm",
+  "chest",
+  "main-hand",
+  "off-hand",
+  "pants",
+  "boots",
+  "gloves",
+  "ring",
+  "mount"
+] as const;
 
-const equipSlots: EquipSlot[] = [
-  'helm',
-  'chest',
-  'mainHand',
-  'offHand',
-  'pants',
-  'boots'
-];
+export type EquipSlot = (typeof EQUIP_SLOTS)[number];
+
+const equipSlots: EquipSlot[] = [...EQUIP_SLOTS];
 
 export default equipSlots;

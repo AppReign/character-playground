@@ -8,8 +8,8 @@
    - **Vanity** (base body customization: hair, facial hair, scars). Mutually exclusive per category. Locked at character creation, mutable later via a restricted UI.
    - **Equipment** (gear the player wears). Slot-based, swappable freely.
 4. **Sex variants** (male / female today, extensible). Each item is the **single source of truth** for its own visuals across sex / pose / layer.
-5. **Layer system extensible** (color masks, orb poses, etc.) without code changes per layer addition.
-6. **Playground is a POC** of what prod will use. We commit to a **schema** here that ports cleanly into the prod equipment JSON via an automated script.
+5. **Layer system extensible** (e.g. orb poses, future **color masks** — see §11 / Phase 5) without code changes per layer addition. **Color masks are not implemented in the playground yet** (no `tintGroup` in data, types, or renderer until Phase 5).
+6. **Playground is a proof-of-concept prototype** of what prod will use. We commit to a **schema** here that ports cleanly into the prod equipment JSON via an automated script.
 7. **Static layered PNGs only** (no animation in scope).
 
 ## 2. Glossary
@@ -24,65 +24,67 @@
 ## 3. Source-of-truth layout
 
 ```
+schemas/
+  equipment-set.schema.json   # JSON Schema: shape + pose rules for equipment set JSON
+  zIndexLayerKeys.schema.json # generated enum of valid `layer` strings (npm run sync:layers)
+src/
+  data/
+    equipment/
+      <setId>.json            # one file per item set — { $schema?, equipSet?, items[] }
 data/
-  layers.json              # The layer registry (name → numeric zIndex)
-  poses.json               # The pose registry (id, label, kind)
-  slots.json               # Slot registry (equipment + vanity)
-  equipment/
-    <setId>/
-      <itemId>.json        # one file per item — full item record
-  vanity/
-    <category>/
-      <itemId>.json        # one file per vanity option
+  layers.json                 # layer registry (name → numeric zIndex)
+  poses.json                  # pose registry (id, label, kind)
+  slots.json                  # slot registry (equipment + vanity)
 public/
   character_parts/
-    base/                  # base body PNGs (M01, F01, ...)
-    equipment/<setId>/...  # gear PNGs
-    vanity/<category>/...  # vanity PNGs
+    base/                     # base body PNGs (M01, F01, …)
+    equipment/<setId>/...     # gear PNGs
+    vanity/<category>/...     # vanity PNGs (future)
 ```
 
 **Rules**
-- One JSON = one item. Folder = grouping for humans (sets/categories).
+- **Editor validation**: `schemas/equipment-set.schema.json` + generated `schemas/zIndexLayerKeys.schema.json` (from `npm run sync:layers`) — missing chest pose buckets, extra keys, misspelled **pose** ids, and invalid **`layer`** strings vs `zIndex` all surface in VS Code/Cursor while editing JSON.
+- One equipment JSON = one **item set** (artist delivery unit): `{ "items": [ … ] }`, optional top-level `equipSet` (must match `<setId>` in the filename). Each array entry is one item with its own `characterDisplay`.
 - PNG paths in JSON are **relative to `public/character_parts/`**, no `..` allowed.
 - Layer ids and pose ids are **strings** (designer-friendly), looked up in registries.
 
 ## 4. Item schema (single source of truth)
 
-The playground item file mirrors the **prod** item shape; visual data lives in **`characterDisplay`**, which is the only thing this playground writes / cares about. Stats etc. are passthrough.
+Playground **equipment** rows in `src/data/equipment/*.json` are intentionally minimal: only the fields needed to render and to match how prod identifies a piece (`id`, `name`, slot, weapon flags). Full prod rows (stats, drops, 3D paths) live in the game DB / exports; a future sync script can merge **`characterDisplay`** from this repo into those records by `id`.
 
 ### 4.1 Equipment item
 
+**Allowed keys on each `items[]` object** (nothing else — `validate:data` uses `.strict()`):
+
+| Key | Required | Notes |
+|-----|----------|--------|
+| `id` | yes | Stable id (e.g. matches prod inventory id). |
+| `name` | yes | Display name for the selector. |
+| `equipSlot` | yes | Production-style strings: `main-hand`, `off-hand`, `helm`, `chest`, `pants`, `boots` (normalized at load). |
+| `characterDisplay` | yes | 2D sprite source of truth (poses, sexes, `layer` keys from `layers.json` / `zIndex`). |
+| `equipType` | no | e.g. `sword`, `crossbow` — gameplay / UI hint. |
+| `twoHanded` | no | Weapons only. |
+
+**`equipSet`** is not stored on the row: the loader sets it from the set file name (`<setId>.json`).
+
 ```jsonc
 {
-  "id": "e.conqueror-chest",
-  "name": "Conqueror Chest",
-  "equipSlot": "chest",                 // from slots.json
-  "equipType": "heavy-chest",           // optional, gameplay metadata
-  "twoHanded": false,                   // weapons only
-
-  // ── prod-only fields (passthrough; playground does not edit) ──
-  "rarity": "common",
-  "isUnique": true,
-  "itemSetIds": ["is.conqueror"],
-  "crownVal": 0, "vcVal": 0, "emVal": 0,
-  "attack": 2, "defense": 2,
-  "imagePath": "/images/item/.../conqueror-chest.png",
-  "raidComponentDefinitions": [],
-
-  // ── playground source of truth ──
+  "id": "e.training-sword-two",
+  "name": "Training Sword",
+  "equipSlot": "main-hand",
+  "equipType": "sword",
+  "twoHanded": false,
   "characterDisplay": {
-    "default": "all",                   // pose used when this item has no pose-specific art
+    "default": "all",
     "perSex": {
       "male": {
         "all": [
-          { "filename": "equipment/conqueror/M05_CHESTOVER", "layer": "EQUIPMENT.CHEST.BODY.UNTUCKED" }
+          { "filename": "equipment/conqueror/M05_CHESTOVER", "layer": "CHESTOVER" }
         ],
-        "1h-left": [
-          { "filename": "equipment/conqueror/M05_ONEHLARM", "layer": "EQUIPMENT.CHEST.OFFHAND.ONE_HANDED" }
-        ],
-        "2h-crossbow": [ /* … */ ]
-      },
-      "female": { /* same shape; required if sex variant exists */ }
+        "1h left": [
+          { "filename": "equipment/conqueror/M05_ONEHLARM", "layer": "ONEHLARM" }
+        ]
+      }
     }
   }
 }
@@ -112,10 +114,11 @@ Identical shape, but `equipSlot` comes from the **vanity slot registry** (`hair`
 ```ts
 type ImageRow = {
   filename: string;     // path under public/character_parts/, no extension
-  layer: LayerId;       // string id from layers.json
-  tintGroup?: string;   // optional: marks this row as user-tintable (color masks)
+  layer: LayerId;       // string id from layers.json / zIndex
 };
 ```
+
+**Color masks / `tintGroup`:** reserved for **Phase 5** (see §11). The image row type and JSON schema intentionally include **only** `filename` and `layer` until that work ships — no mask fields in the playground codebase yet.
 
 ## 5. Registries (the “extension points”)
 
@@ -198,10 +201,11 @@ This is the part that pays off when we have thousands of items.
 
 ## 8. Runtime architecture
 
-- **Boot**: app loads `layers.json`, `poses.json`, `slots.json`, then aggregates **all** `data/equipment/**/*.json` and `data/vanity/**/*.json`.
+- **Boot (today)**: the React app loads equipment set JSON via `equipmentCatalog.ts` and resolves draw order with **`src/config/zIndex.ts`** (`zIndexValue` / `EQUIPMENT` / `BODY` keys). It does **not** load `data/layers.json`, `poses.json`, or `slots.json` at runtime — those files exist for **validators**, **editor tooling** (generated JSON Schema enums), and **designer-facing registries** aligned with the TypeScript source of truth.
+- **Boot (target)**: optionally load the same registries at runtime once the app is fully data-driven.
 - **Catalog**: a map keyed by `id`.
 - **Pose pipeline** (unchanged in shape): main-hand + off-hand poses → derived pose → for each equipped/vanity item, pick `images.perSex[sex][derivedPose] || images.perSex[sex][default]`.
-- **Render**: flatten image rows + numeric z. Tinted rows (`tintGroup` set) are rendered with a CSS/Canvas tint pulled from the player’s color choice.
+- **Render**: flatten image rows + numeric z. **(Phase 5)** tinted / mask rows and per-group player colors — not implemented yet; see §11.
 - **Pose derivation, slot exclusivity, off-hand muting on 2H weapons**: same rules as today, ported to the new schema.
 
 The TS layer (`src/config/equipmentLayer.ts`, `baseLayer.ts`, `zIndex.ts`) becomes a **thin adapter** that reads the JSON registries at startup. Most domain logic stays.
@@ -209,7 +213,7 @@ The TS layer (`src/config/equipmentLayer.ts`, `baseLayer.ts`, `zIndex.ts`) becom
 ## 9. Prod migration script
 
 - The playground JSON for an item *is* the prod item, plus an extra `characterDisplay` block.
-- **`scripts/sync-to-prod.ts`** walks `data/equipment/**`, validates, and merges only the **`characterDisplay`** key into the matching prod item by `id`. Stats / rarity / drop tables in prod are untouched.
+- **`scripts/sync-to-prod.ts`** walks `src/data/equipment/*.json`, validates, and merges only the **`characterDisplay`** key into the matching prod item by `id`. Stats / rarity / drop tables in prod are untouched.
 - An AI prompt template (a separate doc) wraps this for one-shot ports of partial sets.
 - We treat **`id`** as the contract: if a playground id has no prod counterpart, the script reports it; if a prod id has no playground counterpart, the script reports it.
 
@@ -221,7 +225,11 @@ The TS layer (`src/config/equipmentLayer.ts`, `baseLayer.ts`, `zIndex.ts`) becom
 - **UI separation**: vanity has its own selector (separate from `EquipmentSelector`). Equipment screen never shows vanity.
 - **Mutability later**: a separate, restricted “Appearance” UI; this is enforcement at the UI layer, not data — the data model already supports edits.
 
-## 11. Color masks (for weapon tinting, etc.)
+## 11. Color masks (for weapon tinting, etc.) — **deferred (Phase 5)**
+
+**Status:** Design only. **Not implemented** in this playground yet: no `tintGroup` on image rows, no tint state on the character, no mask-aware renderer, and no JSON schema fields for tinting until Phase 5. That keeps authoring and validation focused on static PNG layers.
+
+When implemented, the intended shape is:
 
 - An image row may be marked `"tintGroup": "weapon-primary"`.
 - The character record stores a tint per group: `{ "weapon-primary": "#ff0066" }`.
@@ -232,26 +240,27 @@ The TS layer (`src/config/equipmentLayer.ts`, `baseLayer.ts`, `zIndex.ts`) becom
 
 A pragmatic order of operations for getting from where we are to where we want to be.
 
-### Phase 1 — Schema + registries (no UX change)
-- Introduce `data/layers.json`, `data/poses.json`, `data/slots.json`. Keep current TS layer maps as a generated file from `layers.json`.
-- Add `npm run validate` + Zod schemas. Wire pre-commit + CI.
+### Phase 1 — Schema + registries (no UX change) — **in progress**
+- **Done**: `data/layers.json` (generated from current `zIndex.ts` via `npm run sync:layers`), `data/poses.json`, `data/slots.json`; `npm run validate:data` (Zod + strict match of `layers.json` ↔ `zIndex.ts`); `npm run build` runs validation first. Dev deps: `zod`, `tsx`; `tsconfig.scripts.json` for script typecheck.
+- **Not done yet**: generating `zIndex.ts` from `layers.json` (today JSON follows code); pre-commit hook; CI workflow wiring.
 
-### Phase 2 — Equipment data conversion
-- Convert each existing TS equipment set into per-item JSON files under `data/equipment/<setId>/`.
-- Replace `equipmentPocRegistry` aggregation with JSON glob + validation at boot.
-- App still renders identically.
+### Phase 2 — Equipment data as JSON — **done (playground)**
+- All equipment definitions live under `src/data/equipment/<equipSet>.json` (one file per set). Each `items[]` entry has `characterDisplay` (`default` + `perSex.male` pose buckets, `layer` as `zIndex` keys).
+- `src/data/equipmentCatalog.ts` loads them via webpack `require.context`; `src/config/equipmentDisplay.ts` builds the selector catalog from `allEquipmentItems.ts` (legacy `src/equipment/*` TS modules were removed).
+- `validate:data` checks every equipment JSON (schema, pose keys, layer keys vs `zIndex`).
 
-### Phase 3 — Sex variants
-- Migrate items to `characterDisplay.perSex.male`. Add a sex toggle in the playground UI.
-- Author guidance: every new item must include both sexes (or be flagged unisex).
+### Phase 3 — Sex toggle + per-sex resolution — **done (baseline)**
+- Playground UI: **male / female** buttons (see `CharacterActions`).
+- `resolveEquipmentImagesForHandPose` takes `CharacterSex`; female art missing → **warn once** and fall back to male layers until `perSex.female` is authored in JSON.
+- **Next**: add `perSex.female` blocks per item in JSON as art becomes available.
 
 ### Phase 4 — Vanity system
 - New catalog (`data/vanity/...`), new selector UI.
 - Hook vanity layers into render pipeline (they ride on the same layer registry).
 
-### Phase 5 — Color masks
-- `tintGroup` field + tinting renderer.
-- A few sample swords with masks.
+### Phase 5 — Color masks (**not started — design in §11**)
+- **`tintGroup`** on image rows + tinting renderer + sample swords with masks.
+- Until this phase: do **not** add mask/tint fields to `Config.ts`, equipment JSON, or JSON Schema; the doc above describes the target only.
 
 ### Phase 6 — Prod sync script
 - `scripts/sync-to-prod.ts` + AI prompt doc.
@@ -262,7 +271,7 @@ I’d use **JSON catalog with strict schema + scaffolding command** — best bal
 
 ```bash
 npm run new:item -- --slot chest --setId conqueror --id e.conqueror-chest --sex male,female
-# scaffolds data/equipment/conqueror/e.conqueror-chest.json with required pose stubs
+# scaffolds src/data/equipment/conqueror.json items[] entry with required pose stubs
 # prints the exact PNG paths to drop into public/character_parts/equipment/conqueror/
 ```
 

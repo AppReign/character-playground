@@ -8,8 +8,6 @@ interface AssetsRendererProps {
 }
 
 const AssetsRenderer = ({partsArray}: AssetsRendererProps) => {
-  
-  debugger;
   return (
     <React.Fragment>
       {partsArray.map((part: ConfigPart) =>

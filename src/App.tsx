@@ -7,10 +7,10 @@ import { CharacterActions } from "./components/CharacterActions";
 import classes from "./styles/App.module.scss";
 import characterClasses from "./styles/components/Character.module.scss";
 import allEquipmentItems, {
-  equipmentPocRegistry
+  equipmentRegistry
 } from "./config/allEquipmentItems";
-import { resolvePocImagesForHandPose } from "./config/equipmentFromPoc";
-import { ConfigPart, ConfigPartEquipment } from "./interfaces/Config";
+import { resolveEquipmentImagesForHandPose } from "./config/equipmentDisplay";
+import { ConfigPart, ConfigPartEquipment, CharacterSex } from "./interfaces/Config";
 import { getBaseCharacterAssets } from "./config/partsBase";
 import { EquipSlot } from "./config/equipSlots";
 import EquipSlotSelector from "./components/EquipSlotSelector";
@@ -29,6 +29,7 @@ const App = () => {
   const [equippedItems, setEquippedItems] = useState<ConfigPartEquipment[]>([]);
   const [selectedEquipmentSlot, setSelectedEquipmentSlot] = useState<EquipSlot>('helm');
   const [changing, setChanging] = useState<boolean>(false);
+  const [characterSex, setCharacterSex] = useState<CharacterSex>("male");
 
   useLoadEquipmentFromUrlHash(setEquippedItems, setChanging);
   const randomize = useRandomizeCharacter(setEquippedItems, setChanging);
@@ -48,23 +49,31 @@ const App = () => {
     () =>
       getEquipmentPartsForSlot(
         selectedEquipmentSlot,
-        allEquipmentItems
+        allEquipmentItems,
+        equippedItems
       ),
-    [selectedEquipmentSlot]
+    [selectedEquipmentSlot, equippedItems]
   );
 
   const displayedEquipmentParts = useMemo((): ConfigPartEquipment[] => {
     return equippedItems.map((part) => {
-      if (part.configPocKey && equipmentPocRegistry[part.configPocKey]) {
-        const images = resolvePocImagesForHandPose(
-          equipmentPocRegistry[part.configPocKey],
-          selectedPose
+      if (
+        part.equipmentRegistryKey &&
+        equipmentRegistry[part.equipmentRegistryKey]
+      ) {
+        const images = resolveEquipmentImagesForHandPose(
+          equipmentRegistry[part.equipmentRegistryKey],
+          selectedPose,
+          characterSex
         );
-        return { ...part, images };
+        return {
+          ...part,
+          images: images.length > 0 ? images : part.images
+        };
       }
       return part;
     });
-  }, [equippedItems, selectedPose]);
+  }, [equippedItems, selectedPose, characterSex]);
 
 
   const removeEquipmentPart = (removedPart: ConfigPartEquipment) => {
@@ -82,12 +91,14 @@ const App = () => {
   const addEquipmentPart = (newPart: ConfigPartEquipment) => {
     cleanCharacterUrlHash();
     const is2hWeapon =
-      newPart.pose === "2h" || newPart.pose === "2h crossbow";
+      newPart.pose === "2h" ||
+      newPart.pose === "2h crossbow" ||
+      newPart.twoHanded === true;
     const otherHand: EquipSlot | null =
-      newPart.equipSlot === "mainHand"
-        ? "offHand"
-        : newPart.equipSlot === "offHand"
-          ? "mainHand"
+      newPart.equipSlot === "main-hand"
+        ? "off-hand"
+        : newPart.equipSlot === "off-hand"
+          ? "main-hand"
           : null;
 
     setEquippedItems((prev) => {
@@ -141,6 +152,8 @@ const App = () => {
           save={save}
           share={share}
           refresh={refresh}
+          characterSex={characterSex}
+          onCharacterSexChange={setCharacterSex}
         />
         <EquipSlotSelector
           selectedEquipmentSlot={selectedEquipmentSlot}

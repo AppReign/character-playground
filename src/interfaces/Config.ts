@@ -1,8 +1,8 @@
 import { EquipSlot } from "../config/equipSlots";
 import { ZIndexLayerKey } from "../config/zIndex";
 
-/** One drawable row in a equipment POC; `layer` maps to draw order via `zIndexValue` in `equipmentFromPoc`. */
-export type ConfigPocImageRow = {
+/** One drawable row inside `characterDisplay`; `layer` maps via `zIndexValue`. */
+export type CharacterDisplayImageRow = {
   filename: string;
   layer: ZIndexLayerKey;
 };
@@ -17,6 +17,44 @@ export type Pose =
   | "throwing right"
   | "1h left"
   | "throwing left";
+
+export type CharacterSex = "male" | "female";
+
+/**
+ * `male` carries exactly one pose bucket (e.g. only `"1h left"` or only `"all"`).
+ * Used for `main-hand` / `off-hand` registry items.
+ */
+export type MaleCharacterDisplaySinglePoseBucket = {
+  [K in Pose]: Record<K, CharacterDisplayImageRow[]>;
+}[Pose];
+
+/** Boots, pants, helm: only the `all` bucket on `male` (no per-stance arm variants). */
+export type CharacterDisplayAllOnly = {
+  perSex: {
+    male: { all: CharacterDisplayImageRow[] };
+  };
+};
+
+/** `equipSlot: "chest"`: every `Pose` bucket required on `male`. */
+export type CharacterDisplayChest = {
+  perSex: {
+    male: Record<Pose, CharacterDisplayImageRow[]>;
+    female?: Partial<Record<Pose, CharacterDisplayImageRow[]>>;
+  };
+};
+
+/** `main-hand` / `off-hand`: exactly one male pose bucket. */
+export type CharacterDisplayHand = {
+  perSex: {
+    male: MaleCharacterDisplaySinglePoseBucket;
+  };
+};
+
+/** Union of all slot-specific registry display shapes. */
+export type CharacterDisplay =
+  | CharacterDisplayChest
+  | CharacterDisplayAllOnly
+  | CharacterDisplayHand;
 
 type EquipType =
   | "aerial"
@@ -59,23 +97,27 @@ type EquipType =
   | "wand"
   | "whip";
 
+/**
+ * One equipment row in `src/data/equipmentSets/*.ts`.
+ * `equipSet` for catalog grouping is **not** stored on the row; it is injected from the bundle in `equipmentRegistry.ts`.
+ * Omit `characterDisplay` until art is wired (items without it are skipped by `buildEquipmentCatalog`).
+ */
 export type ItemEquip = {
   id: string;
   name: string;
   equipSlot: EquipSlot;
-  equipSet: string;
-  images: Partial<Record<Pose, ConfigPocImageRow[]>>;
-  equipType?: EquipType;
+  equipType?: EquipType | string;
   twoHanded?: boolean;
+  imagePath?: string;
+  characterDisplay?: CharacterDisplay;
 };
-
 
 export interface ConfigPartType {
   id: number;
   name: string;
 }
 
-/** Equipment pipeline resolves numeric `zIndex` from POC `layer`; base body uses `layer` only (see `baseLayer.ts`). */
+/** Equipment pipeline resolves numeric `zIndex` from equipment `layer`; base body uses `layer` only (see `baseLayer.ts`). */
 export type ConfigImage =
   | {
       filename: string;
@@ -96,13 +138,13 @@ export interface ConfigPart {
 
 export interface ConfigPartEquipment extends ConfigPart {
   equipSlot: EquipSlot;
-  /** Optional: e.g. "sword", "bow". Use Extract<EquipType, "sword" | "bow"> to allow only those. */
-  equipType?: EquipType;
-  /** Empty string when part is not part of a named set (e.g. generic crossbows). */
-  equipSet: '' | 'plainFarmer' | 'miray' | 'bassinianWarder' | 'conqueror' | 'test';
+  /** Optional: e.g. "sword", "bow" (prod may use strings outside this union). */
+  equipType?: EquipType | string;
+  /** Named set / item-set grouping (from bundle in `equipmentRegistry.ts`). */
+  equipSet: string;
   twoHanded?: boolean;
-  /** When set, drawable layers are resolved from `equipmentPocRegistry[configPocKey]` using current main/off-hand poses. */
-  configPocKey?: string;
+  /** When set, drawable layers are resolved from `equipmentRegistry[equipmentRegistryKey]` using current main/off-hand poses. */
+  equipmentRegistryKey?: string;
 }
 
 export default interface Config {

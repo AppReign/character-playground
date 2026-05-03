@@ -71,7 +71,14 @@ git rebase --abort
 ## Useful scripts
 
 ```bash
-npm start      # dev server
-npm run build  # production build (outputs to build/)
-npm test       # tests
+npm start       # dev server
+npm run build   # production build (outputs to build/)
+npm test        # tests
 ```
+
+See `DESIGN.md` for architecture notes (some sections may still describe the older JSON + Zod pipeline).
+
+**Equipment data:** TypeScript modules under `src/data/equipmentSets/*.ts` declare full `ItemEquip` objects (typed `layer` keys via `ZIndexLayerKey`) and are merged in `src/data/equipmentRegistry.ts`. The catalog exposed to the app is built in `src/config/allEquipmentItems.ts`.
+
+**Editor checks:** TypeScript + ESLint (see `.eslintrc.json`) validate modern syntax; `layer` and poses are checked at compile time via `ItemEquip` / `CharacterDisplayImageRow`.
+
