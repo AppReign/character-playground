@@ -10,19 +10,19 @@
  */
 export const BODY = {
   HEAD: {
-    DEFAULT: "BODY_HEAD"
+    BASE: "BODY_HEAD"
   },
   HAIR: {
-    DEFAULT: "BODY_HAIR"
+    OVER: "BODY_HAIR"
   },
   CHEST: {
-    UNDER: "BODY_CHESTUNDER"
+    BASE: "BODY_CHESTUNDER"
   },
-  PANTS: {
-    OVER: "BODY_PANTSOVER"
+  UNDERWEAR: {
+    BOTTOM: "BODY_PANTSOVER"
   },
   FOOT: {
-    UNDER: "BODY_FOOTUNDER"
+    BASE: "BODY_FOOTUNDER"
   },
   ARMS: {
     ONE_HANDED: {

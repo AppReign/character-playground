@@ -24,7 +24,7 @@ export const partsBaseBody: ConfigPart[] = [
     images: [
       {
         filename: "M01_HEAD",
-        layer: BODY.HEAD.DEFAULT
+        layer: BODY.HEAD.BASE
       }
     ]
   },
@@ -34,7 +34,7 @@ export const partsBaseBody: ConfigPart[] = [
     images: [
       {
         filename: "M01_HAIR",
-        layer: BODY.HAIR.DEFAULT
+        layer: BODY.HAIR.OVER
       }
     ]
   },
@@ -44,7 +44,7 @@ export const partsBaseBody: ConfigPart[] = [
     images: [
       {
         filename: "M01_CHESTUNDER",
-        layer: BODY.CHEST.UNDER
+        layer: BODY.CHEST.BASE
       }
     ]
   },
@@ -54,7 +54,7 @@ export const partsBaseBody: ConfigPart[] = [
     images: [
       {
         filename: "M01_PANTSOVER",
-        layer: BODY.PANTS.OVER
+        layer: BODY.UNDERWEAR.BOTTOM
       }
     ]
   },
@@ -64,7 +64,7 @@ export const partsBaseBody: ConfigPart[] = [
     images: [
       {
         filename: "M01_FOOTUNDER",
-        layer: BODY.FOOT.UNDER
+        layer: BODY.FOOT.BASE
       }
     ]
   }

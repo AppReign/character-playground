@@ -28,11 +28,11 @@ export const zIndex = {
   [EQUIPMENT.CHEST.OFFHAND.TWO_HANDED]: 350,
   [EQUIPMENT.CHEST.MAINHAND.TWO_HANDED]: 430,
   /** Body/base — not shared with equipment layer ids; when order matched equipment, value is equipment zIndex − 1. */
-  [BODY.HEAD.DEFAULT]: 475,
-  [BODY.HAIR.DEFAULT]: 480,
-  [BODY.CHEST.UNDER]: 199,
-  [BODY.PANTS.OVER]: 209,
-  [BODY.FOOT.UNDER]: 169,
+  [BODY.HEAD.BASE]: 475,
+  [BODY.HAIR.OVER]: 480,
+  [BODY.CHEST.BASE]: 199,
+  [BODY.UNDERWEAR.BOTTOM]: 209,
+  [BODY.FOOT.BASE]: 169,
   [BODY.ARMS.ONE_HANDED.LEFT.ARM]: 49,
   [BODY.ARMS.ONE_HANDED.LEFT.FINGERS]: 70,
   [BODY.ARMS.ONE_HANDED.RIGHT.ARM]: 264,
@@ -49,8 +49,7 @@ export const zIndex = {
   [BODY.ARMS.THROWING.LEFT]: 264,
   [BODY.ARMS.THROWING.RIGHT]: 224,
   [EQUIPMENT.HELM]: 500,
-  [EQUIPMENT.HEAD.HAIR.OVER]: 505,
-  [EQUIPMENT.OFFHAND.ONE_HANDED.SHIELD.UNDER]: 510
+  [EQUIPMENT.OFFHAND.ONE_HANDED.SHIELD.UNDER]: 505
 } as const;
 
 /** Semantic layer id (matches keys of `zIndex`). Equipment image rows reference this; numbers resolve at build time. */

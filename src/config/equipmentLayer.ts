@@ -1,10 +1,5 @@
 export const EQUIPMENT = {
   HELM: "HELMET",
-  HEAD: {
-    HAIR: {
-      OVER: "HAIROVER"
-    }
-  },
   CHEST: {
     BODY: {
       UNTUCKED: "CHESTOVER",
@@ -52,6 +47,10 @@ export const EQUIPMENT = {
         OVER: 'TWOHCBBODY'
       }
     }
+  },
+  GLOVES: {
+    UNDER: "GLOVESUNDER",
+    OVER: "GLOVESOVER"
   },
   PANTS: {
     UNTUCKED: "PANTSOVER",
