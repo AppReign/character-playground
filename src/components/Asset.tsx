@@ -2,7 +2,7 @@ import React from "react";
 
 import classes from "../styles/components/Asset.module.scss";
 import { ConfigImage } from "../interfaces/Config";
-import { zIndexValue } from "../config/zIndex";
+import { zIndexValue } from "../layers/zIndex";
 import { getImageSrc } from "../utils/imageSrcResolver";
 
 function resolveZIndex(image: ConfigImage): number {

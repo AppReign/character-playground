@@ -1,5 +1,5 @@
 import { EquipSlot } from "../config/equipSlots";
-import { ZIndexLayerKey } from "../config/zIndex";
+import { ZIndexLayerKey } from "../layers/zIndex";
 
 /** One drawable row inside `characterDisplay`; `layer` maps via `zIndexValue`. */
 export type CharacterDisplayImageRow = {
@@ -117,7 +117,7 @@ export interface ConfigPartType {
   name: string;
 }
 
-/** Equipment pipeline resolves numeric `zIndex` from equipment `layer`; base body uses `layer` only (see `baseLayer.ts`). */
+/** Equipment pipeline resolves numeric `zIndex` from equipment `layer`; base body uses `layer` only (see `layers/baseLayer.ts`). */
 export type ConfigImage =
   | {
       filename: string;

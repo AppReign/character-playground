@@ -201,14 +201,14 @@ This is the part that pays off when we have thousands of items.
 
 ## 8. Runtime architecture
 
-- **Boot (today)**: the React app loads equipment set JSON via `equipmentCatalog.ts` and resolves draw order with **`src/config/zIndex.ts`** (`zIndexValue` / `EQUIPMENT` / `BODY` keys). It does **not** load `data/layers.json`, `poses.json`, or `slots.json` at runtime — those files exist for **validators**, **editor tooling** (generated JSON Schema enums), and **designer-facing registries** aligned with the TypeScript source of truth.
+- **Boot (today)**: the React app loads equipment set JSON via `equipmentCatalog.ts` and resolves draw order with **`src/layers/zIndex.ts`** (`zIndexValue` / `EQUIPMENT` / `BODY` keys). It does **not** load `data/layers.json`, `poses.json`, or `slots.json` at runtime — those files exist for **validators**, **editor tooling** (generated JSON Schema enums), and **designer-facing registries** aligned with the TypeScript source of truth.
 - **Boot (target)**: optionally load the same registries at runtime once the app is fully data-driven.
 - **Catalog**: a map keyed by `id`.
 - **Pose pipeline** (unchanged in shape): main-hand + off-hand poses → derived pose → for each equipped/vanity item, pick `images.perSex[sex][derivedPose] || images.perSex[sex][default]`.
 - **Render**: flatten image rows + numeric z. **(Phase 5)** tinted / mask rows and per-group player colors — not implemented yet; see §11.
 - **Pose derivation, slot exclusivity, off-hand muting on 2H weapons**: same rules as today, ported to the new schema.
 
-The TS layer (`src/config/equipmentLayer.ts`, `baseLayer.ts`, `zIndex.ts`) becomes a **thin adapter** that reads the JSON registries at startup. Most domain logic stays.
+The TS layer (`src/layers/equipmentLayer.ts`, `baseLayer.ts`, `zIndex.ts`) becomes a **thin adapter** that reads the JSON registries at startup. Most domain logic stays.
 
 ## 9. Prod migration script
 

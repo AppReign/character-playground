@@ -1,5 +1,5 @@
 import { ConfigPart } from "../interfaces/Config";
-import { BODY } from "./baseLayer";
+import { BODY } from "../layers/baseLayer";
 import {
   deriveBaseArmBundlePoses,
   type EquipmentHandPose

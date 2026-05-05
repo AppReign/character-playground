@@ -1,4 +1,4 @@
-import { EQUIPMENT } from "../../config/equipmentLayer";
+import { EQUIPMENT } from "../../layers/equipmentLayer";
 import type { ItemEquip } from "../../interfaces/Config";
 
 export const testEquipment = [
