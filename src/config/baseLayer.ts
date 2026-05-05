@@ -10,51 +10,53 @@
  */
 export const BODY = {
   HEAD: {
-    BASE: "BODY_HEAD"
+    BASE: "BODY_HEAD_BASE"
   },
   HAIR: {
-    OVER: "BODY_HAIR"
+    OVER: "BODY_HAIR_OVER",
+    UNDER: "BODY_HAIR_UNDER"
   },
   CHEST: {
-    BASE: "BODY_CHESTUNDER"
+    BASE: "BODY_CHEST_BASE"
   },
   UNDERWEAR: {
-    BOTTOM: "BODY_PANTSOVER"
+    TOP: "BODY_UNDERWEAR_TOP",
+    BOTTOM: "BODY_UNDERWEAR_BOTTOM"
   },
   FOOT: {
-    BASE: "BODY_FOOTUNDER"
+    BASE: "BODY_FOOT_BASE" // do we need this? can we put it on the body?
   },
   ARMS: {
     ONE_HANDED: {
       LEFT: {
-        ARM: "BODY_ONEHLARM",
-        FINGERS: "BODY_ONEHLFINGERS"
+        ARM: "BODY_ONEHLARM", // arm that includes a hand layer (under)
+        FINGERS: "BODY_ONEHLFINGERS" // move to hand layer (over)
       },
       RIGHT: {
-        ARM: "BODY_ONEHRARM",
-        FINGERS: "BODY_ONEHRFINGERS"
+        ARM: "BODY_ONEHRARM", // arm that includes a hand layer (under)
+        FINGERS: "BODY_ONEHRFINGERS" // move to hand layer (over)
       },
       CROSSBOW: {
-        LEFT: "BODY_ONEHCBLARM",
-        RIGHT: "BODY_ONEHCBRARM"
+        LEFT: "BODY_ONEHCBLARM", // arm that includes a hand layer (under)
+        RIGHT: "BODY_ONEHCBRARM" // arm that includes a hand layer (under)
       }
     },
     TWO_HANDED: {
       DEFAULT: {
-        RIGHT_ARM: "BODY_TWOHRARM",
-        LEFT_FINGERS: "BODY_TWOHLFINGERS",
-        LEFT_ARM: "BODY_TWOHLARM",
-        RIGHT_FINGERS: "BODY_TWOHRFINGERS"
+        RIGHT_ARM: "BODY_TWOHRARM", // arm that includes a hand layer (under)
+        LEFT_FINGERS: "BODY_TWOHLFINGERS", // move to hand layer (over)
+        LEFT_ARM: "BODY_TWOHLARM", // arm that includes a hand layer (under)
+        RIGHT_FINGERS: "BODY_TWOHRFINGERS" // move to hand layer (over)
       },
       CROSSBOW: {
-        RIGHT_ARM: "BODY_TWOHCBRARM",
-        LEFT_FINGERS: "BODY_TWOHCBLFINGERS",
-        LEFT_ARM: "BODY_TWOHCBLARM"
+        RIGHT_ARM: "BODY_TWOHCBRARM", // arm that includes a hand layer (under)
+        LEFT_FINGERS: "BODY_TWOHCBLFINGERS", // move to hand layer (over)
+        LEFT_ARM: "BODY_TWOHCBLARM" // arm that includes a hand layer (under)
       }
     },
     THROWING: {
-      LEFT: "BODY_ARMLTHROWING",
-      RIGHT: "BODY_ARMRTHROWING"
+      LEFT: "BODY_ARMLTHROWING", // arm that includes a hand layer
+      RIGHT: "BODY_ARMRTHROWING" // arm that includes a hand layer
     }
   }
 } as const;
