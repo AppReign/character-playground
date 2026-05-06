@@ -1,6 +1,5 @@
 import { ConfigImage } from "../interfaces/Config";
-
-const urlPrefix = (process.env.PUBLIC_URL || "") + "/character_parts";
+import { getCharacterPartPublicUrl } from "./characterPartUrl";
 
 /**
  * Resolve the image URL for rendering. Uses image.src if set (e.g. from require()),
@@ -9,5 +8,5 @@ const urlPrefix = (process.env.PUBLIC_URL || "") + "/character_parts";
  */
 export function getImageSrc(image: ConfigImage): string {
   if (image.src) return image.src;
-  return urlPrefix + "/" + image.filename + ".png";
+  return getCharacterPartPublicUrl(image.filename);
 }
