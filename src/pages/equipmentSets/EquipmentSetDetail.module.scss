@@ -188,21 +188,39 @@
   width: 38%;
 }
 
+.filePreviewLink {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  line-height: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  outline-offset: 2px;
+
+  &:focus-visible {
+    outline: 2px solid rgba(120, 170, 255, 0.85);
+  }
+
+  &:hover {
+    border-color: rgba(120, 170, 255, 0.45);
+  }
+}
+
+.filePreviewImg {
+  display: block;
+  max-width: 140px;
+  max-height: 140px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
 .fileCode {
   display: block;
   word-break: break-all;
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.75);
-  margin-bottom: 0.25rem;
-}
-
-.fileLink {
-  font-size: 0.75rem;
-  color: rgba(120, 170, 255, 0.95);
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
 .usageCell {
