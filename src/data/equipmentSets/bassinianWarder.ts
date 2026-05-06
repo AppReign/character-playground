@@ -6,7 +6,7 @@ const BW = "bassinianWarder/";
 /** Vanity set `bassinian-warder` — `equipSet` for catalog grouping: `bassinianWarder` (file `bassinianWarder.ts`). */
 export const bassinianWarderEquipment = [
   {
-    id: "e.bassinian-warder-brhes",
+    id: "e.bassinian-warder-breeches",
     name: "Bassinian Warder Breeches",
     equipSlot: "pants",
     imagePath: "/images/item-icons/bassinian-warder-breeches.png",
