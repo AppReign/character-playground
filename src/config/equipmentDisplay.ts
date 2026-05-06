@@ -9,7 +9,7 @@ import {
 } from "../interfaces/Config";
 import type { EquipmentSetBundle } from "../data/equipmentRegistry";
 import type { EquipSlot } from "./equipSlots";
-import { zIndexValue } from "./zIndex";
+import { zIndexValue } from "../layers/zIndex";
 import {
   deriveChestSecondaryBucketPose,
   EquipmentHandPose

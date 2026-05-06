@@ -1,5 +1,5 @@
 import type { ItemEquip } from "../../interfaces/Config";
-import { EQUIPMENT } from "../../config/equipmentLayer";
+import { EQUIPMENT } from "../../layers/equipmentLayer";
 
 const CQ = "conqueror/";
 

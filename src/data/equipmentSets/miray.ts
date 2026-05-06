@@ -1,5 +1,5 @@
 import type { ItemEquip } from "../../interfaces/Config";
-import { EQUIPMENT } from "../../config/equipmentLayer";
+import { EQUIPMENT } from "../../layers/equipmentLayer";
 const MR = "miray/";
 
 /** Vanity set `miray` — `equipSet` for catalog grouping: `miray` (file `miray.ts`). */
