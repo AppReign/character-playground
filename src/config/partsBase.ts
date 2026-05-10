@@ -14,7 +14,7 @@ export const getBaseCharacterAssets = (pose: EquipmentHandPose) => {
 };
 
 /**
- * Base character parts: face/body, hair, bare chest, base pants/foot.
+ * Base character parts: face/body, hair, bare body (torso and legs), base pants.
  * No arms.
  */
 export const partsBaseBody: ConfigPart[] = [
@@ -39,12 +39,12 @@ export const partsBaseBody: ConfigPart[] = [
     ]
   },
   {
-    name: "CHEST MALE 01",
+    name: "BASE BODY MALE 01",
     pose: 'all',
     images: [
       {
         filename: "M01_CHESTUNDER",
-        layer: BODY.CHEST.BASE
+        layer: BODY.BODY.BASE
       }
     ]
   },
@@ -55,16 +55,6 @@ export const partsBaseBody: ConfigPart[] = [
       {
         filename: "M01_PANTSOVER",
         layer: BODY.UNDERWEAR.BOTTOM
-      }
-    ]
-  },
-  {
-    name: "BASE FOOT MALE 01",
-    pose: 'all',
-    images: [
-      {
-        filename: "M01_FOOTUNDER",
-        layer: BODY.FOOT.BASE
       }
     ]
   }
@@ -81,11 +71,11 @@ export const partsBaseArms: ConfigPart[] = [
     images: [
       {
         filename: "M01_ONEHLARM",
-        layer: BODY.ARMS.ONE_HANDED.LEFT.ARM
+        layer: BODY.MAINHAND.ONE_HANDED.UNDER
       },
       {
         filename: "M01_ONEHLFINGERS",
-        layer: BODY.ARMS.ONE_HANDED.LEFT.FINGERS
+        layer: BODY.MAINHAND.ONE_HANDED.OVER
       }
     ]
   },
@@ -95,11 +85,11 @@ export const partsBaseArms: ConfigPart[] = [
     images: [
       {
         filename: "M01_ONEHRARM",
-        layer: BODY.ARMS.ONE_HANDED.RIGHT.ARM
+        layer: BODY.OFFHAND.ONE_HANDED.UNDER
       },
       {
         filename: "M01_ONEHRFINGERS",
-        layer: BODY.ARMS.ONE_HANDED.RIGHT.FINGERS
+        layer: BODY.OFFHAND.ONE_HANDED.OVER
       }
     ]
   },
@@ -109,19 +99,19 @@ export const partsBaseArms: ConfigPart[] = [
     images: [
       {
         filename: "M01_TWOHRARM",
-        layer: BODY.ARMS.TWO_HANDED.DEFAULT.RIGHT_ARM
+        layer: BODY.OFFHAND.TWO_HANDED.UNDER
       },
       {
         filename: "M01_TWOHLFINGERS",
-        layer: BODY.ARMS.TWO_HANDED.DEFAULT.LEFT_FINGERS
+        layer: BODY.MAINHAND.TWO_HANDED.OVER
       },
       {
         filename: "M01_TWOHLARM",
-        layer: BODY.ARMS.TWO_HANDED.DEFAULT.LEFT_ARM
+        layer: BODY.MAINHAND.TWO_HANDED.UNDER
       },
       {
         filename: "M01_TWOHRFINGERS",
-        layer: BODY.ARMS.TWO_HANDED.DEFAULT.RIGHT_FINGERS
+        layer: BODY.OFFHAND.TWO_HANDED.OVER
       }
     ]
   },
@@ -131,15 +121,15 @@ export const partsBaseArms: ConfigPart[] = [
     images: [
       {
         filename: "M01_TWOHCBRARM",
-        layer: BODY.ARMS.TWO_HANDED.CROSSBOW.RIGHT_ARM
+        layer: BODY.OFFHAND.TWO_HANDED_CROSSBOW.UNDER
       },
       {
         filename: "M01_TWOHCBLFINGERS",
-        layer: BODY.ARMS.TWO_HANDED.CROSSBOW.LEFT_FINGERS
+        layer: BODY.MAINHAND.TWO_HANDED_CROSSBOW.OVER
       },
       {
         filename: "M01_TWOHCBLARM",
-        layer: BODY.ARMS.TWO_HANDED.CROSSBOW.LEFT_ARM
+        layer: BODY.MAINHAND.TWO_HANDED_CROSSBOW.UNDER
       }
     ]
   },
@@ -149,7 +139,7 @@ export const partsBaseArms: ConfigPart[] = [
     images: [
       {
         filename: "M01_ONEHCBLARM",
-        layer: BODY.ARMS.ONE_HANDED.CROSSBOW.LEFT
+        layer: BODY.MAINHAND.ONE_HANDED_CROSSBOW.UNDER
       }
     ]
   },
@@ -159,7 +149,7 @@ export const partsBaseArms: ConfigPart[] = [
     images: [
       {
         filename: "M01_ONEHCBRARM",
-        layer: BODY.ARMS.ONE_HANDED.CROSSBOW.RIGHT
+        layer: BODY.OFFHAND.ONE_HANDED_CROSSBOW.UNDER
       }
     ]
   },
@@ -169,7 +159,7 @@ export const partsBaseArms: ConfigPart[] = [
     images: [
       {
         filename: "M01_ARMLTHROWING",
-        layer: BODY.ARMS.THROWING.LEFT
+        layer: BODY.MAINHAND.ONE_HANDED_THROWING.UNDER
       }
     ]
   },
@@ -179,7 +169,7 @@ export const partsBaseArms: ConfigPart[] = [
     images: [
       {
         filename: "M01_ARMRTHROWING",
-        layer: BODY.ARMS.THROWING.RIGHT
+        layer: BODY.OFFHAND.ONE_HANDED_THROWING.UNDER
       }
     ]
   }

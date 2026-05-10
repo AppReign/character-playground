@@ -37,11 +37,11 @@ export const testEquipment = [
           "2h crossbow": [
             {
               filename: "M0_TWOHCBSLING",
-              layer: EQUIPMENT.MAINHAND.TWO_HANDED.CROSSBOW.UNDER
+              layer: EQUIPMENT.MAINHAND.TWO_HANDED.UNDER
             },
             {
               filename: "M0_TWOHCBBODY",
-              layer: EQUIPMENT.MAINHAND.TWO_HANDED.CROSSBOW.OVER
+              layer: EQUIPMENT.MAINHAND.TWO_HANDED.OVER
             }
           ]
         }

@@ -10,53 +10,56 @@
  */
 export const BODY = {
   HEAD: {
-    BASE: "BODY_HEAD_BASE"
+    BASE: "BODY_HEAD_BASE",
   },
   HAIR: {
     OVER: "BODY_HAIR_OVER",
     UNDER: "BODY_HAIR_UNDER"
   },
-  CHEST: {
-    BASE: "BODY_CHEST_BASE"
+  BODY: {
+    BASE: "BODY_BODY_BASE"
   },
   UNDERWEAR: {
     TOP: "BODY_UNDERWEAR_TOP",
     BOTTOM: "BODY_UNDERWEAR_BOTTOM"
   },
-  FOOT: {
-    BASE: "BODY_FOOT_BASE" // do we need this? can we put it on the body?
-  },
-  ARMS: {
+  MAINHAND: {
     ONE_HANDED: {
-      LEFT: {
-        ARM: "BODY_ONEHLARM", // arm that includes a hand layer (under)
-        FINGERS: "BODY_ONEHLFINGERS" // move to hand layer (over)
-      },
-      RIGHT: {
-        ARM: "BODY_ONEHRARM", // arm that includes a hand layer (under)
-        FINGERS: "BODY_ONEHRFINGERS" // move to hand layer (over)
-      },
-      CROSSBOW: {
-        LEFT: "BODY_ONEHCBLARM", // arm that includes a hand layer (under)
-        RIGHT: "BODY_ONEHCBRARM" // arm that includes a hand layer (under)
-      }
+      UNDER: "BODY_ONEHLARM",
+      OVER: "BODY_ONEHLFINGERS"
+    },
+    ONE_HANDED_CROSSBOW: {
+      UNDER: "BODY_ONEHCBLARM"
+    },
+    ONE_HANDED_THROWING: {
+      UNDER: "BODY_ARMLTHROWING"
     },
     TWO_HANDED: {
-      DEFAULT: {
-        RIGHT_ARM: "BODY_TWOHRARM", // arm that includes a hand layer (under)
-        LEFT_FINGERS: "BODY_TWOHLFINGERS", // move to hand layer (over)
-        LEFT_ARM: "BODY_TWOHLARM", // arm that includes a hand layer (under)
-        RIGHT_FINGERS: "BODY_TWOHRFINGERS" // move to hand layer (over)
-      },
-      CROSSBOW: {
-        RIGHT_ARM: "BODY_TWOHCBRARM", // arm that includes a hand layer (under)
-        LEFT_FINGERS: "BODY_TWOHCBLFINGERS", // move to hand layer (over)
-        LEFT_ARM: "BODY_TWOHCBLARM" // arm that includes a hand layer (under)
-      }
+      UNDER: "BODY_TWOHLARM",
+      OVER: "BODY_TWOHLFINGERS"
     },
-    THROWING: {
-      LEFT: "BODY_ARMLTHROWING", // arm that includes a hand layer
-      RIGHT: "BODY_ARMRTHROWING" // arm that includes a hand layer
+    TWO_HANDED_CROSSBOW: {
+      UNDER: "BODY_TWOHCBLARM",
+      OVER: "BODY_TWOHCBLFINGERS"
+    }
+  },
+  OFFHAND: {
+    ONE_HANDED: {
+      UNDER: "BODY_ONEHRARM",
+      OVER: "BODY_ONEHRFINGERS"
+    },
+    ONE_HANDED_CROSSBOW: {
+      UNDER: "BODY_ONEHCBRARM"
+    },
+    ONE_HANDED_THROWING: {
+      UNDER: "BODY_ARMRTHROWING"
+    },
+    TWO_HANDED: {
+      UNDER: "BODY_TWOHRARM",
+      OVER: "BODY_TWOHRFINGERS"
+    },
+    TWO_HANDED_CROSSBOW: {
+      UNDER: "BODY_TWOHCBRARM"
     }
   }
 } as const;
