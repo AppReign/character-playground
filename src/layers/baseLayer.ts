@@ -13,8 +13,8 @@ export const BODY = {
     BASE: "BODY_HEAD_BASE",
   },
   HAIR: {
-    OVER: "BODY_HAIR_OVER",
-    UNDER: "BODY_HAIR_UNDER"
+    OVER: "BODY_HAIR_OVER", // helm
+    UNDER: "BODY_HAIR_UNDER" // no helm
   },
   BODY: {
     BASE: "BODY_BODY_BASE"

@@ -19,7 +19,7 @@ export const getBaseCharacterAssets = (pose: EquipmentHandPose) => {
  */
 export const partsBaseBody: ConfigPart[] = [
   {
-    name: "MALE",
+    name: "BASE HEAD MALE 01",
     pose: 'all',
     images: [
       {
@@ -43,21 +43,11 @@ export const partsBaseBody: ConfigPart[] = [
     pose: 'all',
     images: [
       {
-        filename: "M01_CHESTUNDER",
+        filename: "M01_BODY_BASE",
         layer: BODY.BODY.BASE
       }
     ]
   },
-  {
-    name: "BASE PANTS MALE 01",
-    pose: 'all',
-    images: [
-      {
-        filename: "M01_PANTSOVER",
-        layer: BODY.UNDERWEAR.BOTTOM
-      }
-    ]
-  }
 ];
 
 

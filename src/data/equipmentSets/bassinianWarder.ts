@@ -36,7 +36,7 @@ export const bassinianWarderEquipment = [
           all: [
             {
               filename: BW + "M04_CHESTOVER",
-              layer: EQUIPMENT.CHEST.BODY.UNTUCKED
+              layer: EQUIPMENT.CHEST.BODY.TUCKED
             }
           ],
           "1h left": [
@@ -153,7 +153,7 @@ export const bassinianWarderEquipment = [
           "1h left": [
             {
               filename: BW + "M04_ONEHLWEAPON",
-              layer: EQUIPMENT.MAINHAND.ONE_HANDED.DEFAULT.UNDER
+              layer: EQUIPMENT.MAINHAND.ONE_HANDED.DEFAULT.UNDER,
             }
           ]
         }
