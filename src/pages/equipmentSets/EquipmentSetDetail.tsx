@@ -1,19 +1,28 @@
 import React, { useMemo } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
+import EquipmentImagePreview from "../../components/EquipmentImagePreview";
+import CdnCheckProgress from "../../components/CdnCheckProgress";
+import CdnStatusBadge, { type CdnBadgeStatus } from "../../components/CdnStatusBadge";
 import { useAuth } from "../../context/AuthContext";
+import { useCreatorEquipment } from "../../context/CreatorEquipmentContext";
 
 import type { EquipSlot } from "../../config/equipSlots";
-import { equipmentSetBundles } from "../../data/equipmentRegistry";
 import type { ExtractedImageRef } from "../../utils/extractCharacterDisplayImages";
 import { uniqueFilenames } from "../../utils/extractCharacterDisplayImages";
 import { getCharacterPartPublicUrl } from "../../utils/characterPartUrl";
+import { buildEquipmentCdnUrl } from "../../utils/apiCharacterDisplay";
+import type { CreatorEquipmentItem } from "../../utils/apiCharacterDisplay";
 import { formatEquipSetLabel } from "../../utils/formatEquipSetLabel";
-import { useEquipmentValidation } from "./equipmentValidationContext";
+import {
+  useEquipmentValidation,
+  type CdnRollupStatus
+} from "./equipmentValidationContext";
 import type { ItemValidationResult } from "../../utils/validateEquipmentBundle";
+import progressClasses from "../../components/CdnCheckProgress.module.scss";
 import classes from "./EquipmentSetDetail.module.scss";
 
-/** Accordion order: helm, chest, main-hand, off-hand, gloves, boots; then pants, ring, mount. */
+/** Accordion order: helm, chest, main-hand, off-hand, gloves, boots; then pants. */
 const DETAIL_ACCORDION_SLOT_ORDER: EquipSlot[] = [
   "helm",
   "chest",
@@ -22,8 +31,6 @@ const DETAIL_ACCORDION_SLOT_ORDER: EquipSlot[] = [
   "gloves",
   "boots",
   "pants",
-  "ring",
-  "mount"
 ];
 
 function compareItemsBySlotThenName(a: ItemValidationResult, b: ItemValidationResult): number {
@@ -47,14 +54,86 @@ function groupRefsByFilename(
   return m;
 }
 
+function previewUrlForRef(
+  cdnBaseUrl: string,
+  apiItem: CreatorEquipmentItem | undefined,
+  ref: ExtractedImageRef
+): string {
+  if (apiItem && cdnBaseUrl) {
+    return buildEquipmentCdnUrl(apiItem, ref, cdnBaseUrl);
+  }
+  return getCharacterPartPublicUrl(ref.filename);
+}
+
+function badgeStatusForItem(status: CdnRollupStatus): CdnBadgeStatus {
+  switch (status) {
+    case "ok":
+      return "ok";
+    case "pending":
+      return "pending";
+    case "issue":
+      return "issue";
+    case "error":
+    case "na":
+    default:
+      return "error";
+  }
+}
+
+function titleForItemStatus(status: CdnRollupStatus): string {
+  switch (status) {
+    case "ok":
+      return "All sprites on CDN";
+    case "pending":
+      return "Checking CDN sprites";
+    case "issue":
+      return "Missing or empty characterDisplay";
+    case "error":
+    case "na":
+    default:
+      return "Some sprites missing on CDN";
+  }
+}
+
+function badgeForSetStatus(status: CdnRollupStatus): {
+  label: string;
+  dataStatus: "pending" | "ok" | "error" | "issue";
+} {
+  switch (status) {
+    case "ok":
+      return {
+        label: "All items have every sprite on CDN",
+        dataStatus: "ok"
+      };
+    case "pending":
+      return {
+        label: "Checking CDN sprites…",
+        dataStatus: "pending"
+      };
+    case "issue":
+      return {
+        label: "Some items missing valid characterDisplay",
+        dataStatus: "issue"
+      };
+    case "error":
+    default:
+      return {
+        label: "Some items missing sprites on CDN",
+        dataStatus: "error"
+      };
+  }
+}
+
 const EquipmentSetDetail = () => {
   const { canUploadCharacterAssets } = useAuth();
   const { equipSetId } = useParams<{ equipSetId: string }>();
-  const { validationBySet } = useEquipmentValidation();
+  const { validationBySet, bundles, getItemCdnStatus, getSetCdnStatus, cdnCheckProgress } =
+    useEquipmentValidation();
+  const { cdnBaseUrl, itemById, loading, error, refresh } = useCreatorEquipment();
 
   const bundle = useMemo(
-    () => equipmentSetBundles.find((b) => b.equipSet === equipSetId),
-    [equipSetId]
+    () => bundles.find((b) => b.equipSet === equipSetId),
+    [bundles, equipSetId]
   );
 
   const validation = equipSetId ? validationBySet[equipSetId] : undefined;
@@ -73,6 +152,9 @@ const EquipmentSetDetail = () => {
   }
 
   const v = validation;
+  const setBadge = badgeForSetStatus(getSetCdnStatus(bundle.equipSet));
+  const showProgress =
+    cdnCheckProgress.checked < cdnCheckProgress.total;
 
   return (
     <div className={classes.detail}>
@@ -84,18 +166,42 @@ const EquipmentSetDetail = () => {
             ·
           </span>
           {bundle.items.length} item{bundle.items.length !== 1 ? "s" : ""}
+          <span className={classes.dot} aria-hidden>
+            ·
+          </span>
+          <span>CDN previews</span>
         </p>
+        {error && (
+          <p className={classes.warn}>
+            API: {error}{" "}
+            <button type="button" className={classes.refreshBtn} onClick={() => void refresh()}>
+              Retry
+            </button>
+          </p>
+        )}
+        {loading && <p className={classes.summaryMuted}>Loading equipment from API…</p>}
+        {showProgress && (
+          <div className={progressClasses.detailWrap}>
+            <CdnCheckProgress
+              checked={cdnCheckProgress.checked}
+              total={cdnCheckProgress.total}
+              variant="inline"
+            />
+          </div>
+        )}
         <div className={classes.bundleSummary}>
           <span
             className={classes.summaryBadge}
-            data-status={v.allItemsDone ? "ok" : "issue"}
+            data-status={setBadge.dataStatus}
           >
-            {v.allItemsDone
-              ? "All items have valid characterDisplay"
-              : `${v.itemsMissingValidDisplay} item${v.itemsMissingValidDisplay !== 1 ? "s" : ""} missing valid characterDisplay`}
+            {setBadge.dataStatus === "pending" && (
+              <span className={classes.summarySpinner} aria-hidden />
+            )}
+            {setBadge.label}
           </span>
           <span className={classes.summaryMuted}>
-            {v.itemsWithValidDisplay} valid · {v.itemsMissingValidDisplay} incomplete
+            {v.itemsWithValidDisplay} with display data · {v.itemsMissingValidDisplay}{" "}
+            incomplete wiring
           </span>
         </div>
       </header>
@@ -103,25 +209,21 @@ const EquipmentSetDetail = () => {
       <ul className={classes.itemList}>
         {sortedItemRows.map((row) => {
           const refsByFile = groupRefsByFilename(row.refs);
-          const needsAttention = !row.done;
+          const itemStatus = getItemCdnStatus(row.item.id);
+          const needsAttention = itemStatus !== "ok";
           const files = uniqueFilenames(row.refs);
+          const apiItem = itemById[row.item.id];
 
           return (
             <li key={row.item.id}>
               <details className={classes.details} open={needsAttention}>
                 <summary className={classes.itemSummary}>
                   <span className={classes.itemTitle}>
-                    <span
-                      className={classes.itemStatus}
-                      data-status={row.done ? "ok" : "issue"}
-                      title={
-                        row.done
-                          ? "Valid characterDisplay"
-                          : "Missing or empty characterDisplay"
-                      }
-                    >
-                      {row.done ? "✓" : "!"}
-                    </span>
+                    <CdnStatusBadge
+                      status={badgeStatusForItem(itemStatus)}
+                      title={titleForItemStatus(itemStatus)}
+                      size="md"
+                    />
                     <span className={classes.itemName}>{row.item.name}</span>
                   </span>
                   <span className={classes.itemSlot}>{row.item.equipSlot}</span>
@@ -156,26 +258,19 @@ const EquipmentSetDetail = () => {
                     <tbody>
                       {files.map((filename) => {
                         const refs = refsByFile.get(filename) ?? [];
-                        const url = getCharacterPartPublicUrl(filename);
+                        const ref = refs[0];
+                        const url = ref
+                          ? previewUrlForRef(cdnBaseUrl, apiItem, ref)
+                          : getCharacterPartPublicUrl(filename);
                         return (
                           <tr key={filename}>
                             <td className={classes.fileCell}>
-                              <a
-                                className={classes.filePreviewLink}
-                                href={url}
-                                target="_blank"
-                                rel="noreferrer"
-                                title={`Open ${filename}.png in a new tab`}
-                              >
-                                <img
-                                  className={classes.filePreviewImg}
-                                  src={url}
-                                  alt={`${filename} equipment layer preview`}
-                                  loading="lazy"
-                                />
-                              </a>
+                              <EquipmentImagePreview
+                                url={url}
+                                label={filename}
+                              />
                               <code className={classes.fileCode}>
-                                {filename}.png
+                                {filename.endsWith(".png") ? filename : `${filename}.png`}
                               </code>
                             </td>
                             <td className={classes.usageCell}>

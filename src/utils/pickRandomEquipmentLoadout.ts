@@ -1,4 +1,3 @@
-import allEquipmentItems from "../config/allEquipmentItems";
 import { EquipSlot } from "../config/equipSlots";
 import { ConfigPartEquipment } from "../interfaces/Config";
 import {
@@ -36,19 +35,16 @@ function pickOrSkip<T>(
 
 /**
  * Builds a valid equipment list matching creator rules:
- * — only catalog `allEquipmentItems` entries
+ * — only catalog entries
  * — at most one item per `equipSlot`
- * — each slot (main, off, helm, chest, pants, boots) may stay empty (`unequipChance`)
- * — if main hand is 2h / 2h crossbow, no off-hand item (same as `addEquipmentPart`)
- * — when main is equipped and not 2h, off-hand is chosen only from non-2h items if any exist
- *   (so a random 2h off-hand never wipes main)
- * — armor slots use options valid for the derived hand pose
+ * — each slot may stay empty (`unequipChance`)
+ * — 2h main-hand excludes off-hand
  */
 export function pickRandomEquipmentLoadout(
+  catalog: ConfigPartEquipment[],
   unequipChance: number = DEFAULT_UNEQUIP_CHANCE
 ): ConfigPartEquipment[] {
   const p = clamp01(unequipChance);
-  const catalog = allEquipmentItems;
   const picks: ConfigPartEquipment[] = [];
 
   const mainCandidates = catalog.filter((part) => part.equipSlot === "main-hand");

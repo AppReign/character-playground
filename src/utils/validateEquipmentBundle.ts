@@ -1,4 +1,4 @@
-import type { EquipmentSetBundle } from "../data/equipmentRegistry";
+import type { EquipmentSetBundle } from "../types/equipmentSet";
 import type { ItemEquip } from "../interfaces/Config";
 import {
   extractRequiredCharacterImages,

@@ -1,0 +1,69 @@
+.wrap {
+  padding: 0.5rem 0.65rem 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.inline {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.spinner {
+  flex-shrink: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  animation: cdnProgressSpin 0.7s linear infinite;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+}
+
+.count {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.track {
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  border-radius: inherit;
+  background: rgba(120, 170, 255, 0.85);
+  transition: width 0.2s ease;
+
+  &[data-complete="true"] {
+    background: rgba(125, 255, 179, 0.75);
+  }
+}
+
+@keyframes cdnProgressSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.detailWrap {
+  margin-bottom: 1rem;
+}

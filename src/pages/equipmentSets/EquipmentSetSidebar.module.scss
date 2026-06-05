@@ -87,4 +87,9 @@
     color: #ffb39c;
     background: rgba(255, 156, 124, 0.15);
   }
+
+  &[data-status="error"] {
+    color: #ff7a7a;
+    background: rgba(255, 122, 122, 0.15);
+  }
 }

@@ -13,13 +13,10 @@ export type Pose = (typeof FULL_POSE_KEYS)[number];
 
 export type CharacterSex = "male" | "female";
 
-/**
- * `male` carries exactly one pose bucket (e.g. only `"1h mainhand"` or only `"all"`).
- * Used for `main-hand` / `off-hand` registry items.
- */
-export type MaleCharacterDisplaySinglePoseBucket = {
-  [K in Pose]: Record<K, CharacterDisplayImageRow[]>;
-}[Pose];
+/** `main-hand` / `off-hand`: only the `all` bucket on `male`. */
+export type MaleCharacterDisplayAllOnlyBucket = {
+  all: CharacterDisplayImageRow[];
+};
 
 /** Boots, pants, helm: only the `all` bucket on `male` (no per-stance arm variants). */
 export type CharacterDisplayAllOnly = {
@@ -36,10 +33,10 @@ export type CharacterDisplayChest = {
   };
 };
 
-/** `main-hand` / `off-hand`: exactly one male pose bucket. */
+/** `main-hand` / `off-hand`: only the `all` bucket (z-index from equip type, not stance). */
 export type CharacterDisplayHand = {
   perSex: {
-    male: MaleCharacterDisplaySinglePoseBucket;
+    male: MaleCharacterDisplayAllOnlyBucket;
   };
 };
 
@@ -91,8 +88,8 @@ type EquipType =
   | "whip";
 
 /**
- * One equipment row in `src/data/equipmentSets/*.ts`.
- * `equipSet` for catalog grouping is **not** stored on the row; it is injected from the bundle in `equipmentRegistry.ts`.
+ * One equipment row loaded from the game API (`POST /api/data/items/batch`).
+ * `equipSet` for catalog grouping comes from `vanity.vanitySet` on the API item.
  * Omit `characterDisplay` until art is wired (items without it are skipped by `buildEquipmentCatalog`).
  */
 export type ItemEquip = {
@@ -133,10 +130,10 @@ export interface ConfigPartEquipment extends ConfigPart {
   equipSlot: EquipSlot;
   /** Optional: e.g. "sword", "bow" (prod may use strings outside this union). */
   equipType?: EquipType | string;
-  /** Named set / item-set grouping (from bundle in `equipmentRegistry.ts`). */
+  /** Named vanity set grouping (from API `vanity.vanitySet`). */
   equipSet: string;
   twoHanded?: boolean;
-  /** When set, drawable layers are resolved from `equipmentRegistry[equipmentRegistryKey]` using current main/off-hand poses. */
+  /** Item id (`e.*`) used to resolve drawable layers from the API catalog. */
   equipmentRegistryKey?: string;
 }
 

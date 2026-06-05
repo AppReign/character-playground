@@ -170,6 +170,23 @@ function resolveHandWeaponZIndex(
   return key;
 }
 
+/** Whether a hand-weapon display row has a defined stack slot (e.g. default-1h has under only). */
+export function supportsHandWeaponZIndex(
+  equipSlot: "main-hand" | "off-hand",
+  poseKey: Pose,
+  layer: CharacterStackLayer | string,
+  equipType: string | undefined,
+  twoHanded?: boolean
+): boolean {
+  const normalized = normalizeStackLayer(String(layer));
+  if (normalized !== "over" && normalized !== "under") {
+    return false;
+  }
+  const category = weaponCategory(equipType, poseKey, twoHanded);
+  const table = equipSlot === "main-hand" ? MAIN_HAND_ZINDEX : OFF_HAND_ZINDEX;
+  return !!table[category][normalized];
+}
+
 function resolveGlovesZIndex(
   layer: CharacterStackLayer,
   handPose: EquipmentHandPose

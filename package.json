@@ -25,7 +25,6 @@
     "start:stage": "env-cmd -f .env.staging react-scripts start",
     "build": "react-scripts build",
     "build:stage": "env-cmd -f .env.staging react-scripts build",
-    "generate:equipment": "node scripts/generate-equipment-sets.mjs",
     "deploy": "npm run build && gh-pages -d build",
     "deploy:stage": "npm run build:stage && gh-pages -d build",
     "test": "react-scripts test",

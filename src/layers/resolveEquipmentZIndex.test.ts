@@ -23,15 +23,34 @@ describe("resolveEquipmentZIndex", () => {
     ).toBe(zIndexValue(EQUIPMENT.CHEST.MAINHAND.TWO_HANDED));
   });
 
-  it("resolves main-hand crossbow over/under from pose bucket", () => {
+  it("resolves main-hand crossbow over/under at all pose", () => {
     expect(
       resolveEquipmentZIndex({
         equipSlot: "main-hand",
-        poseKey: "1h mainhand crossbow",
+        poseKey: "all",
         layer: "under",
         equipType: "crossbow"
       })
     ).toBe(zIndexValue(EQUIPMENT.MAINHAND.ONE_HANDED.CROSSBOW.UNDER));
+    expect(
+      resolveEquipmentZIndex({
+        equipSlot: "main-hand",
+        poseKey: "all",
+        layer: "over",
+        equipType: "crossbow"
+      })
+    ).toBe(zIndexValue(EQUIPMENT.MAINHAND.ONE_HANDED.CROSSBOW.OVER));
+  });
+
+  it("resolves main-hand default 1h under at all pose", () => {
+    expect(
+      resolveEquipmentZIndex({
+        equipSlot: "main-hand",
+        poseKey: "all",
+        layer: "under",
+        equipType: "sword"
+      })
+    ).toBe(zIndexValue(EQUIPMENT.MAINHAND.ONE_HANDED.DEFAULT.UNDER));
   });
 
   it("resolves off-hand shield under", () => {

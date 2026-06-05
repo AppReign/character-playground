@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 
 import { layerPresetsForEquipSlot } from "../config/uploadLayerPresets";
 import { poseKeysForEquipSlot } from "../config/characterPoseCatalog";
-import { equipmentSetBundles } from "../data/equipmentRegistry";
+import { useCreatorEquipment } from "../context/CreatorEquipmentContext";
 import type { ItemEquip } from "../interfaces/Config";
 import {
   uploadEquipmentCharacterImage,
@@ -13,15 +13,8 @@ import classes from "./EquipmentCharacterUpload.module.scss";
 
 const GENDERS = ["male", "female"] as const;
 
-function findItemById(itemId: string): ItemEquip | undefined {
-  for (const bundle of equipmentSetBundles) {
-    const item = bundle.items.find((i) => i.id === itemId);
-    if (item) return item;
-  }
-  return undefined;
-}
-
 const EquipmentCharacterUpload = () => {
+  const { bundles, refresh } = useCreatorEquipment();
   const [searchParams] = useSearchParams();
   const initialItemId = searchParams.get("itemId") ?? "";
 
@@ -40,7 +33,14 @@ const EquipmentCharacterUpload = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<EquipmentCharacterImageUploadResult | null>(null);
 
-  const selectedItem = useMemo(() => (itemId ? findItemById(itemId) : undefined), [itemId]);
+  const selectedItem = useMemo((): ItemEquip | undefined => {
+    if (!itemId) return undefined;
+    for (const bundle of bundles) {
+      const item = bundle.items.find((i) => i.id === itemId);
+      if (item) return item;
+    }
+    return undefined;
+  }, [itemId, bundles]);
 
   const poseOptions = useMemo(
     () => (selectedItem ? poseKeysForEquipSlot(selectedItem.equipSlot) : ["all"]),
@@ -66,10 +66,10 @@ const EquipmentCharacterUpload = () => {
 
   const allItems = useMemo(
     () =>
-      equipmentSetBundles.flatMap((b) =>
+      bundles.flatMap((b) =>
         b.items.map((item) => ({ item, equipSet: b.equipSet }))
       ),
-    []
+    [bundles]
   );
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -104,6 +104,7 @@ const EquipmentCharacterUpload = () => {
         file
       });
       setResult(uploadResult);
+      await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {

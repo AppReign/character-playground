@@ -1,0 +1,56 @@
+.badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-weight: 700;
+  line-height: 1;
+
+  &.sm {
+    width: 1.35rem;
+    height: 1.35rem;
+    font-size: 0.75rem;
+  }
+
+  &.md {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.8rem;
+  }
+
+  &[data-status="ok"] {
+    color: #7dffb3;
+    background: rgba(125, 255, 179, 0.12);
+  }
+
+  &[data-status="pending"] {
+    color: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &[data-status="issue"] {
+    color: #ffb39c;
+    background: rgba(255, 156, 124, 0.15);
+  }
+
+  &[data-status="error"] {
+    color: #ff7a7a;
+    background: rgba(255, 122, 122, 0.15);
+  }
+}
+
+.spinner {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-top-color: rgba(255, 255, 255, 0.82);
+  border-radius: 50%;
+  animation: cdnSpin 0.7s linear infinite;
+}
+
+@keyframes cdnSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
