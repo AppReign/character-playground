@@ -1,5 +1,4 @@
 import type { ItemEquip } from "../../interfaces/Config";
-import { EQUIPMENT } from "../../layers/equipmentLayer";
 
 const BW = "bassinianWarder/";
 
@@ -17,7 +16,7 @@ export const bassinianWarderEquipment = [
           all: [
             {
               filename: BW + "M04_PANTSOVER",
-              layer: EQUIPMENT.PANTS.UNTUCKED
+              layer: "base"
             }
           ]
         }
@@ -36,63 +35,55 @@ export const bassinianWarderEquipment = [
           all: [
             {
               filename: BW + "M04_CHESTOVER",
-              layer: EQUIPMENT.CHEST.BODY.TUCKED
+              layer: "base"
             }
           ],
           "1h mainhand": [
             {
               filename: BW + "M04_ONEHLARM",
-              layer: EQUIPMENT.CHEST.OFFHAND.ONE_HANDED
+              layer: "base"
             }
           ],
           "1h offhand": [
             {
               filename: BW + "M04_ONEHRARM",
-              layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
+              layer: "base"
             }
           ],
           "2h": [
             {
               filename: BW + "M04_TWOHRARM",
-              layer: EQUIPMENT.CHEST.MAINHAND.TWO_HANDED
-            },
-            {
-              filename: BW + "M04_TWOHLARM",
-              layer: EQUIPMENT.CHEST.OFFHAND.TWO_HANDED
+              layer: "base"
             }
           ],
           "2h crossbow": [
             {
               filename: BW + "M04_TWOHCBRARM",
-              layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_TWO_HANDED
-            },
-            {
-              filename: BW + "M04_TWOHCBLARM",
-              layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED
+              layer: "base"
             }
           ],
           "1h mainhand crossbow": [
             {
               filename: BW + "M04_ONEHCBLARM",
-              layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED
+              layer: "base"
             }
           ],
           "1h offhand crossbow": [
             {
               filename: BW + "M04_ONEHCBRARM",
-              layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED
+              layer: "base"
             }
           ],
           "throwing mainhand": [
             {
               filename: BW + "M04_ARMLTHROWING",
-              layer: EQUIPMENT.CHEST.OFFHAND.THROWING
+              layer: "base"
             }
           ],
           "throwing offhand": [
             {
               filename: BW + "M04_ARMRTHROWING",
-              layer: EQUIPMENT.CHEST.MAINHAND.THROWING
+              layer: "base"
             }
           ]
         }
@@ -116,7 +107,7 @@ export const bassinianWarderEquipment = [
       perSex: {
         male: {
           all: [
-            { filename: BW + "M04_HELMET", layer: EQUIPMENT.HELM },
+            { filename: BW + "M04_HELMET", layer: "base" },
           ]
         }
       }
@@ -134,7 +125,7 @@ export const bassinianWarderEquipment = [
           all: [
             {
               filename: BW + "M04_FOOTUNDER",
-              layer: EQUIPMENT.BOOTS.TUCKED
+              layer: "base"
             }
           ]
         }
@@ -153,7 +144,7 @@ export const bassinianWarderEquipment = [
           "1h mainhand": [
             {
               filename: BW + "M04_ONEHLWEAPON",
-              layer: EQUIPMENT.MAINHAND.ONE_HANDED.DEFAULT.UNDER,
+              layer: "under",
             }
           ]
         }

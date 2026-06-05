@@ -1,5 +1,4 @@
 import type { ItemEquip } from "../../interfaces/Config";
-import { EQUIPMENT } from "../../layers/equipmentLayer";
 
 const CQ = "conqueror/";
 
@@ -15,7 +14,7 @@ export const conquerorEquipment = [
       perSex: {
         male: {
           all: [
-            { filename: CQ + "M05_PANTS", layer: EQUIPMENT.PANTS.UNTUCKED }
+            { filename: CQ + "M05_PANTS", layer: "base" }
           ]
         }
       }
@@ -33,63 +32,55 @@ export const conquerorEquipment = [
           all: [
             {
               filename: CQ + "M05_CHESTOVER",
-              layer: EQUIPMENT.CHEST.BODY.UNTUCKED
+              layer: "base"
             }
           ],
           "1h mainhand": [
             {
               filename: CQ + "M05_ONEHLARM",
-              layer: EQUIPMENT.CHEST.OFFHAND.ONE_HANDED
+              layer: "base"
             }
           ],
           "1h offhand": [
             {
               filename: CQ + "M05_ONEHRARM",
-              layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
+              layer: "base"
             }
           ],
           "2h": [
             {
               filename: CQ + "M05_TWOHRARM",
-              layer: EQUIPMENT.CHEST.MAINHAND.TWO_HANDED
-            },
-            {
-              filename: CQ + "M05_TWOHLARM",
-              layer: EQUIPMENT.CHEST.OFFHAND.TWO_HANDED
+              layer: "base"
             }
           ],
           "2h crossbow": [
             {
               filename: CQ + "M05_TWOHCBRARM",
-              layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_TWO_HANDED
-            },
-            {
-              filename: CQ + "M05_TWOHCBLARM",
-              layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED
+              layer: "base"
             }
           ],
           "1h mainhand crossbow": [
             {
               filename: CQ + "M05_ONEHCBLARM",
-              layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED
+              layer: "base"
             }
           ],
           "1h offhand crossbow": [
             {
               filename: CQ + "M05_ONEHCBRARM",
-              layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED
+              layer: "base"
             }
           ],
           "throwing mainhand": [
             {
               filename: CQ + "M05_ARMLTHROWING",
-              layer: EQUIPMENT.CHEST.OFFHAND.THROWING
+              layer: "base"
             }
           ],
           "throwing offhand": [
             {
               filename: CQ + "M05_ARMRTHROWING",
-              layer: EQUIPMENT.CHEST.MAINHAND.THROWING
+              layer: "base"
             }
           ]
         }
@@ -108,7 +99,7 @@ export const conquerorEquipment = [
           all: [
             {
               filename: CQ + "M05_FOOTUNDER",
-              layer: EQUIPMENT.BOOTS.TUCKED
+              layer: "base"
             }
           ]
         }
@@ -124,7 +115,7 @@ export const conquerorEquipment = [
     characterDisplay: {
       perSex: {
         male: {
-          all: [{ filename: CQ + "M05_HELMET", layer: EQUIPMENT.HELM }]
+          all: [{ filename: CQ + "M05_HELMET", layer: "base" }]
         }
       }
     }
@@ -155,7 +146,7 @@ export const conquerorEquipment = [
           "1h mainhand": [
             {
               filename: CQ + "M05_ONEHLWEAPON",
-              layer: EQUIPMENT.MAINHAND.ONE_HANDED.DEFAULT.UNDER
+              layer: "under"
             }
           ]
         }

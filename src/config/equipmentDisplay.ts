@@ -9,17 +9,11 @@ import {
 } from "../interfaces/Config";
 import type { EquipmentSetBundle } from "../data/equipmentRegistry";
 import type { EquipSlot } from "./equipSlots";
-import { zIndexValue } from "../layers/zIndex";
+import { resolveEquipmentZIndex } from "../layers/resolveEquipmentZIndex";
 import {
   deriveChestSecondaryBucketPose,
   EquipmentHandPose
 } from "../utils/equipmentPose";
-
-function toConfigImage(
-  row: Pick<CharacterDisplayImageRow, "filename" | "layer">
-): ConfigImage {
-  return { filename: row.filename, zIndex: zIndexValue(row.layer) };
-}
 
 const femaleFallbackWarned = new Set<string>();
 
@@ -66,18 +60,40 @@ function isHandPoseKeyedBuckets(
   return Object.keys(buckets).some((k) => k !== "all");
 }
 
-function pushUniqueLayers(
+function toConfigImage(
+  item: ItemEquip,
+  poseKey: Pose,
+  row: CharacterDisplayImageRow,
+  handPose?: EquipmentHandPose
+): { filename: string; zIndex: number } {
+  return {
+    filename: row.filename,
+    zIndex: resolveEquipmentZIndex({
+      equipSlot: item.equipSlot,
+      poseKey,
+      layer: row.layer,
+      equipType: item.equipType,
+      twoHanded: item.twoHanded,
+      handPose
+    })
+  };
+}
+
+function pushBucketLayers(
+  item: ItemEquip,
+  bucketPoseKey: Pose,
   layers: CharacterDisplayImageRow[] | undefined,
+  handPose: EquipmentHandPose | undefined,
   seen: Set<string>,
-  out: ConfigImage[]
+  out: { filename: string; zIndex: number }[]
 ): void {
   if (!layers?.length) return;
   for (const row of layers) {
-    const z = zIndexValue(row.layer);
-    const key = `${row.filename}|${z}`;
+    const image = toConfigImage(item, bucketPoseKey, row, handPose);
+    const key = `${image.filename}|${image.zIndex}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push({ filename: row.filename, zIndex: z });
+    out.push(image);
   }
 }
 
@@ -103,7 +119,7 @@ export function resolveEquipmentImagesForHandPose(
     : deriveCatalogPoseFromBuckets(maleBuckets);
 
   const seen = new Set<string>();
-  const out: ConfigImage[] = [];
+  const out: { filename: string; zIndex: number }[] = [];
   const slot = item.equipSlot;
 
   const allOnlySlots: readonly EquipSlot[] = [
@@ -115,31 +131,42 @@ export function resolveEquipmentImagesForHandPose(
     "mount"
   ];
   if (allOnlySlots.includes(slot)) {
-    pushUniqueLayers(buckets.all, seen, out);
+    pushBucketLayers(item, "all", buckets.all, slot === "gloves" ? pose : undefined, seen, out);
     if (out.length) return out;
     const first = Object.values(buckets).find((v) => v?.length);
-    pushUniqueLayers(first, seen, out);
+    const firstKey = (Object.entries(buckets).find(([, v]) => v?.length)?.[0] ?? "all") as Pose;
+    pushBucketLayers(item, firstKey, first, slot === "gloves" ? pose : undefined, seen, out);
     return out;
   }
 
   if (slot === "main-hand") {
-    pushUniqueLayers(buckets.all, seen, out);
-    pushUniqueLayers(buckets[pose.mainHandPose] ?? buckets[def], seen, out);
+    pushBucketLayers(item, "all", buckets.all, pose, seen, out);
+    const handPoseKey = (pose.mainHandPose in buckets ? pose.mainHandPose : def) as Pose;
+    pushBucketLayers(item, handPoseKey, buckets[handPoseKey] ?? buckets[def], pose, seen, out);
     return out;
   }
 
   if (slot === "off-hand") {
-    pushUniqueLayers(buckets.all, seen, out);
-    pushUniqueLayers(buckets[pose.offHandPose] ?? buckets[def], seen, out);
+    pushBucketLayers(item, "all", buckets.all, pose, seen, out);
+    const handPoseKey = (pose.offHandPose in buckets ? pose.offHandPose : def) as Pose;
+    pushBucketLayers(item, handPoseKey, buckets[handPoseKey] ?? buckets[def], pose, seen, out);
     return out;
   }
 
-  // Chest: stance-dependent overlays for both hands (second bucket may use complementary
-  // mainhand/offhand idle when both slots share the same one-hand catalog pose).
-  pushUniqueLayers(buckets.all, seen, out);
-  pushUniqueLayers(buckets[pose.mainHandPose] ?? buckets[def], seen, out);
-  pushUniqueLayers(
+  pushBucketLayers(item, "all", buckets.all, pose, seen, out);
+  pushBucketLayers(
+    item,
+    pose.mainHandPose,
+    buckets[pose.mainHandPose] ?? buckets[def],
+    pose,
+    seen,
+    out
+  );
+  pushBucketLayers(
+    item,
+    deriveChestSecondaryBucketPose(pose),
     buckets[deriveChestSecondaryBucketPose(pose)] ?? buckets[def],
+    pose,
     seen,
     out
   );
@@ -172,18 +199,20 @@ function imagesForCatalogEntry(
 ): ConfigImage[] {
   const buckets = getMalePoseBuckets(item);
   if (isHandPoseKeyedBuckets(buckets)) {
-    return (buckets.all ?? []).map(toConfigImage);
+    return (buckets.all ?? []).map((row) => toConfigImage(item, "all", row));
   }
   const catalogPose = deriveCatalogPose(item);
   const poseLayers = buckets[catalogPose];
   if (poseLayers?.length) {
-    return poseLayers.map(toConfigImage);
+    return poseLayers.map((row) => toConfigImage(item, catalogPose, row));
   }
   if (buckets.all?.length) {
-    return buckets.all.map(toConfigImage);
+    return buckets.all.map((row) => toConfigImage(item, "all", row));
   }
-  const first = Object.values(buckets).find((v) => v?.length);
-  return first ? first.map(toConfigImage) : [];
+  const firstEntry = Object.entries(buckets).find(([, v]) => v?.length);
+  if (!firstEntry) return [];
+  const [poseKey, rows] = firstEntry as [Pose, CharacterDisplayImageRow[]];
+  return rows.map((row) => toConfigImage(item, poseKey, row));
 }
 
 function catalogEntryFromRegistryItem(
@@ -199,7 +228,6 @@ function catalogEntryFromRegistryItem(
     images: imagesForCatalogEntry(item),
     ...(item.equipType !== undefined ? { equipType: item.equipType } : {}),
     ...(item.twoHanded !== undefined ? { twoHanded: item.twoHanded } : {}),
-    /** Always resolve layers from `equipmentRegistry` at render time when art exists. */
     equipmentRegistryKey: registryKey
   };
 }

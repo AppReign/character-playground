@@ -1,4 +1,3 @@
-import { EQUIPMENT } from "../../layers/equipmentLayer";
 import type { ItemEquip } from "../../interfaces/Config";
 
 export const testEquipment = [
@@ -14,11 +13,11 @@ export const testEquipment = [
           "1h mainhand crossbow": [
             {
               filename: "M0_ONEHCBLSLING",
-              layer: EQUIPMENT.MAINHAND.ONE_HANDED.CROSSBOW.UNDER
+              layer: "under"
             },
             {
               filename: "M0_ONEHCBLBODY",
-              layer: EQUIPMENT.MAINHAND.ONE_HANDED.CROSSBOW.OVER
+              layer: "over"
             }
           ]
         }
@@ -37,11 +36,11 @@ export const testEquipment = [
           "2h crossbow": [
             {
               filename: "M0_TWOHCBSLING",
-              layer: EQUIPMENT.MAINHAND.TWO_HANDED.UNDER
+              layer: "under"
             },
             {
               filename: "M0_TWOHCBBODY",
-              layer: EQUIPMENT.MAINHAND.TWO_HANDED.OVER
+              layer: "over"
             }
           ]
         }
@@ -60,11 +59,11 @@ export const testEquipment = [
           "1h offhand crossbow": [
             {
               filename: "M0_ONEHCBRSLING",
-              layer: EQUIPMENT.OFFHAND.ONE_HANDED.CROSSBOW.UNDER
+              layer: "under"
             },
             {
               filename: "M0_ONEHCBRBODY",
-              layer: EQUIPMENT.OFFHAND.ONE_HANDED.CROSSBOW.OVER
+              layer: "over"
             }
           ]
         }

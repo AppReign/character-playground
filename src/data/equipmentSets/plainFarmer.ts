@@ -1,5 +1,4 @@
 import type { ItemEquip } from "../../interfaces/Config";
-import { EQUIPMENT } from "../../layers/equipmentLayer";
 
 const PF = "plainFarmer/";
 
@@ -17,7 +16,7 @@ export const plainFarmerEquipment = [
             all: [
               {
                 filename: PF + "M02_PANTSOVER",
-                layer: EQUIPMENT.PANTS.UNTUCKED
+                layer: "base"
               }
             ]
           }
@@ -36,63 +35,55 @@ export const plainFarmerEquipment = [
             all: [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_BASE",
-                layer: EQUIPMENT.CHEST.BODY.UNTUCKED
+                layer: "base"
               }
             ],
             "1h mainhand": [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_MAINHAND_1H",
-                layer: EQUIPMENT.CHEST.OFFHAND.ONE_HANDED
+                layer: "base"
               }
             ],
             "1h offhand": [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_OFFHAND_1H",
-                layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
+                layer: "base"
               }
             ],
             "2h": [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_MAINHAND_2H",
-                layer: EQUIPMENT.CHEST.MAINHAND.TWO_HANDED
-              },
-              {
-                filename: PF + "M02_PLAINFARMER_CHEST_OFFHAND_2H",
-                layer: EQUIPMENT.CHEST.OFFHAND.TWO_HANDED
+                layer: "base"
               }
             ],
             "2h crossbow": [
               {
                 filename: PF + "M02_TWOHCBRARM",
-                layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_TWO_HANDED
-              },
-              {
-                filename: PF + "M02_TWOHCBLARM",
-                layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED
+                layer: "base"
               }
             ],
             "1h mainhand crossbow": [
               {
                 filename: PF + "M02_ONEHCBLARM",
-                layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED
+                layer: "base"
               }
             ],
             "1h offhand crossbow": [
               {
                 filename: PF + "M02_ONEHCBRARM",
-                layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED
+                layer: "base"
               }
             ],
             "throwing mainhand": [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_OFFHAND_THROWING",
-                layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
+                layer: "base"
               }
             ],
             "throwing offhand": [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_MAINHAND_THROWING",
-                layer: EQUIPMENT.CHEST.MAINHAND.THROWING
+                layer: "base"
               }
             ]
           }

@@ -1,5 +1,4 @@
 import type { ItemEquip } from "../../interfaces/Config";
-import { EQUIPMENT } from "../../layers/equipmentLayer";
 const MR = "miray/";
 
 /** Vanity set `miray` — `equipSet` for catalog grouping: `miray` (file `miray.ts`). */
@@ -16,7 +15,7 @@ export const mirayEquipment = [
             all: [
               {
                 filename: MR + "M03_RSHIELD",
-                layer: EQUIPMENT.OFFHAND.ONE_HANDED.SHIELD.UNDER
+                layer: "under"
               }
             ]
           }
@@ -33,7 +32,7 @@ export const mirayEquipment = [
         perSex: {
           male: {
             all: [
-              { filename: MR + "M03_HELMET", layer: EQUIPMENT.HELM }
+              { filename: MR + "M03_HELMET", layer: "base" }
             ]
           }
         }
@@ -51,63 +50,55 @@ export const mirayEquipment = [
             all: [
               {
                 filename: MR + "M03_CHESTUNDER",
-                layer: EQUIPMENT.CHEST.BODY.TUCKED
+                layer: "base"
               }
             ],
             "1h mainhand": [
               {
                 filename: MR + "M03_ONEHLARM",
-                layer: EQUIPMENT.CHEST.OFFHAND.ONE_HANDED
+                layer: "base"
               }
             ],
             "1h offhand": [
               {
                 filename: MR + "M03_ONEHRARM",
-                layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
+                layer: "base"
               }
             ],
             "2h": [
               {
                 filename: MR + "M03_TWOHRARM",
-                layer: EQUIPMENT.CHEST.MAINHAND.TWO_HANDED
-              },
-              {
-                filename: MR + "M03_TWOHLARM",
-                layer: EQUIPMENT.CHEST.OFFHAND.TWO_HANDED
+                layer: "base"
               }
             ],
             "2h crossbow": [
               {
                 filename: MR + "M03_TWOHCBRARM",
-                layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_TWO_HANDED
-              },
-              {
-                filename: MR + "M03_TWOHCBLARM",
-                layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED
+                layer: "base"
               }
             ],
             "1h mainhand crossbow": [
               {
                 filename: MR + "M03_ONEHCBLARM",
-                layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED
+                layer: "base"
               }
             ],
             "1h offhand crossbow": [
               {
                 filename: MR + "M03_ONEHCBRARM",
-                layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED
+                layer: "base"
               }
             ],
             "throwing mainhand": [
               {
                 filename: MR + "M03_ARMLTHROWING",
-                layer: EQUIPMENT.CHEST.OFFHAND.THROWING
+                layer: "base"
               }
             ],
             "throwing offhand": [
               {
                 filename: MR + "M03_ARMRTHROWING",
-                layer: EQUIPMENT.CHEST.MAINHAND.THROWING
+                layer: "base"
               }
             ]
           }
@@ -133,7 +124,7 @@ export const mirayEquipment = [
             all: [
               {
                 filename: MR + "M03_FOOTUNDER",
-                layer: EQUIPMENT.BOOTS.UNTUCKED
+                layer: "base"
               }
             ]
           }
@@ -152,7 +143,7 @@ export const mirayEquipment = [
             "1h mainhand": [
               {
                 filename: MR + "M03_ONEHLWEAPON",
-                layer: EQUIPMENT.MAINHAND.ONE_HANDED.DEFAULT.UNDER
+                layer: "under"
               }
             ]
           }
@@ -169,7 +160,7 @@ export const mirayEquipment = [
         perSex: {
           male: {
             all: [
-              { filename: MR + "M03_PANTS", layer: EQUIPMENT.PANTS.UNTUCKED }
+              { filename: MR + "M03_PANTS", layer: "base" }
             ]
           }
         }

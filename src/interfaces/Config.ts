@@ -1,11 +1,12 @@
 import { FULL_POSE_KEYS } from "../config/characterPoseCatalog";
 import { EquipSlot } from "../config/equipSlots";
+import { CharacterStackLayer } from "../layers/characterStackLayer";
 import { ZIndexLayerKey } from "../layers/zIndex";
 
-/** One drawable row inside `characterDisplay`; `layer` maps via `zIndexValue`. */
+/** One drawable row inside `characterDisplay`; `layer` resolves via `resolveEquipmentZIndex`. */
 export type CharacterDisplayImageRow = {
   filename: string;
-  layer: ZIndexLayerKey;
+  layer: CharacterStackLayer;
 };
 
 export type Pose = (typeof FULL_POSE_KEYS)[number];
