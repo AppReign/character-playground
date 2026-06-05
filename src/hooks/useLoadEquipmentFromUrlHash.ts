@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import partsBase from "../config/partsBase";
-import allEquipmentItems from "../config/allEquipmentItems";
 import { ConfigPart, ConfigPartEquipment } from "../interfaces/Config";
 import { mergeEquipmentPartWithConfig } from "../utils/mergeEquipmentPartWithConfig";
 
@@ -17,9 +16,12 @@ type SetChanging = React.Dispatch<React.SetStateAction<boolean>>;
  */
 export function useLoadEquipmentFromUrlHash(
   setEquippedItems: SetEquippedItems,
-  setChanging: SetChanging
+  setChanging: SetChanging,
+  catalog: ConfigPartEquipment[]
 ): void {
   useEffect(() => {
+    if (!catalog.length) return;
+
     const characterBase64 = window.location.hash.split("#")[1];
     if (!characterBase64) return;
 
@@ -28,7 +30,7 @@ export function useLoadEquipmentFromUrlHash(
     setTimeout(() => setChanging(false), 500);
     const savedEquipment = savedParts.filter((p) => !basePartNames.has(p.name));
     setEquippedItems(
-      savedEquipment.map((p) => mergeEquipmentPartWithConfig(p, allEquipmentItems))
+      savedEquipment.map((p) => mergeEquipmentPartWithConfig(p, catalog))
     );
-  }, [setEquippedItems, setChanging]);
+  }, [setEquippedItems, setChanging, catalog]);
 }

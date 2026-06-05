@@ -6,33 +6,34 @@ import EquipmentSelector from "../components/EquipmentSelector";
 import { CharacterActions } from "../components/CharacterActions";
 import classes from "../styles/App.module.scss";
 import characterClasses from "../styles/components/Character.module.scss";
-import allEquipmentItems, {
-  equipmentRegistry
-} from "../config/allEquipmentItems";
-import { resolveEquipmentImagesForHandPose } from "../config/equipmentDisplay";
 import { ConfigPart, ConfigPartEquipment, CharacterSex } from "../interfaces/Config";
 import { getBaseCharacterAssets } from "../config/partsBase";
 import { EquipSlot } from "../config/equipSlots";
 import EquipSlotSelector from "../components/EquipSlotSelector";
 import {
   derivePoseFromEquipment,
-  getEquipmentPartsForSlot
+  getEquipmentPartsForSlot,
+  weaponOccupiesBothHands
 } from "../utils/equipmentPose";
 import { useLoadEquipmentFromUrlHash } from "../hooks/useLoadEquipmentFromUrlHash";
 import { useRandomizeCharacter } from "../hooks/useRandomizeCharacter";
+import { useEquipmentCatalog } from "../hooks/useEquipmentCatalog";
 import { cleanCharacterUrlHash } from "../utils/cleanCharacterUrlHash";
 import { mergeEquipmentPartWithConfig } from "../utils/mergeEquipmentPartWithConfig";
 import { saveCharacterAsPng } from "../utils/saveCharacterImage";
+import { resolveEquipmentImagesWithCdn } from "../utils/equipmentCatalog";
 
 const Playground = () => {
+  const { ready, loading, error, catalog, itemEquipById, itemById, cdnBaseUrl } =
+    useEquipmentCatalog();
   const [equippedItems, setEquippedItems] = useState<ConfigPartEquipment[]>([]);
   const [selectedEquipmentSlot, setSelectedEquipmentSlot] =
     useState<EquipSlot>("helm");
   const [changing, setChanging] = useState<boolean>(false);
   const [characterSex, setCharacterSex] = useState<CharacterSex>("male");
 
-  useLoadEquipmentFromUrlHash(setEquippedItems, setChanging);
-  const randomize = useRandomizeCharacter(setEquippedItems, setChanging);
+  useLoadEquipmentFromUrlHash(setEquippedItems, setChanging, catalog);
+  const randomize = useRandomizeCharacter(setEquippedItems, setChanging, catalog);
 
   const selectedPose = useMemo(
     () => derivePoseFromEquipment(equippedItems),
@@ -46,33 +47,36 @@ const Playground = () => {
 
   const equipmentPartsForSlot = useMemo(
     () =>
-      getEquipmentPartsForSlot(
-        selectedEquipmentSlot,
-        allEquipmentItems,
-        equippedItems
-      ),
-    [selectedEquipmentSlot, equippedItems]
+      getEquipmentPartsForSlot(selectedEquipmentSlot, catalog, equippedItems),
+    [selectedEquipmentSlot, catalog, equippedItems]
   );
 
   const displayedEquipmentParts = useMemo((): ConfigPartEquipment[] => {
     return equippedItems.map((part) => {
-      if (
-        part.equipmentRegistryKey &&
-        equipmentRegistry[part.equipmentRegistryKey]
-      ) {
-        const images = resolveEquipmentImagesForHandPose(
-          equipmentRegistry[part.equipmentRegistryKey],
-          selectedPose,
-          characterSex
-        );
-        return {
-          ...part,
-          images: images.length > 0 ? images : part.images
-        };
+      const key = part.equipmentRegistryKey;
+      if (!key || !itemEquipById[key] || !itemById[key]) {
+        return part;
       }
-      return part;
+      const images = resolveEquipmentImagesWithCdn(
+        itemEquipById[key],
+        itemById[key],
+        selectedPose,
+        characterSex,
+        cdnBaseUrl
+      );
+      return {
+        ...part,
+        images: images.length > 0 ? images : part.images
+      };
     });
-  }, [equippedItems, selectedPose, characterSex]);
+  }, [
+    equippedItems,
+    selectedPose,
+    characterSex,
+    itemEquipById,
+    itemById,
+    cdnBaseUrl
+  ]);
 
   const removeEquipmentPart = (removedPart: ConfigPartEquipment) => {
     cleanCharacterUrlHash();
@@ -88,10 +92,7 @@ const Playground = () => {
 
   const addEquipmentPart = (newPart: ConfigPartEquipment) => {
     cleanCharacterUrlHash();
-    const is2hWeapon =
-      newPart.pose === "2h" ||
-      newPart.pose === "2h crossbow" ||
-      newPart.twoHanded === true;
+    const newUsesBothHands = weaponOccupiesBothHands(newPart);
     const otherHand: EquipSlot | null =
       newPart.equipSlot === "main-hand"
         ? "off-hand"
@@ -102,11 +103,12 @@ const Playground = () => {
     setEquippedItems((prev) => {
       const withoutSameSlot = prev.filter((part) => {
         if (part.equipSlot === newPart.equipSlot) return false;
-        if (is2hWeapon && otherHand && part.equipSlot === otherHand)
-          return false;
+        if (!otherHand || part.equipSlot !== otherHand) return true;
+        if (newUsesBothHands) return false;
+        if (weaponOccupiesBothHands(part)) return false;
         return true;
       });
-      const merged = mergeEquipmentPartWithConfig(newPart, allEquipmentItems);
+      const merged = mergeEquipmentPartWithConfig(newPart, catalog);
       return [...withoutSameSlot, merged];
     });
   };
@@ -127,6 +129,22 @@ const Playground = () => {
   };
 
   const backgroundImageUrl = `${process.env.PUBLIC_URL || ""}/character_parts/BACKGROUND.png`;
+
+  if (!ready || loading) {
+    return (
+      <div className={classes.playgroundRoot}>
+        <p className={classes.loadingMessage}>Loading equipment from API…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={classes.playgroundRoot}>
+        <p className={classes.loadingMessage}>Equipment unavailable: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className={classes.playgroundRoot}>

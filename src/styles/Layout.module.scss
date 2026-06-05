@@ -10,4 +10,21 @@
   min-height: 0;
   overflow: auto;
   background: #0f121c;
+  color: rgba(255, 255, 255, 0.92);
+
+  a {
+    color: #9ec5ff;
+
+    &:hover {
+      color: #c5dcff;
+    }
+  }
+
+  code {
+    color: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
 }

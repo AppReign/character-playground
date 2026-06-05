@@ -7,8 +7,6 @@ export const EQUIP_SLOTS = [
   "pants",
   "boots",
   "gloves",
-  "ring",
-  "mount"
 ] as const;
 
 export type EquipSlot = (typeof EQUIP_SLOTS)[number];

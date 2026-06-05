@@ -29,12 +29,29 @@
   line-height: 1.2;
   margin-top: 4px;
   word-break: break-word;
-  color: #333;
+  color: #ffffff;
+}
+
+.partItemMissing {
+  border-color: #d94a4a;
+  background: rgba(220, 72, 72, 0.5);
+  color: #fff;
+}
+
+.partItemChecking {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.partItemBadge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  z-index: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 .partItemSelected {
-  @extend .partItem;
-
   &:before {
     border: 2px solid #bfbcbc;
     content: "";
@@ -45,4 +62,8 @@
     right: -5px;
     bottom: -5px;
   }
+}
+
+.partItemLabelMissing {
+  color: #ff8a7a;
 }
