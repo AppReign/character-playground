@@ -1,5 +1,7 @@
 import React, { useMemo } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
+
+import { useAuth } from "../../context/AuthContext";
 
 import type { EquipSlot } from "../../config/equipSlots";
 import { equipmentSetBundles } from "../../data/equipmentRegistry";
@@ -46,6 +48,7 @@ function groupRefsByFilename(
 }
 
 const EquipmentSetDetail = () => {
+  const { canUploadCharacterAssets } = useAuth();
   const { equipSetId } = useParams<{ equipSetId: string }>();
   const { validationBySet } = useEquipmentValidation();
 
@@ -122,6 +125,15 @@ const EquipmentSetDetail = () => {
                     <span className={classes.itemName}>{row.item.name}</span>
                   </span>
                   <span className={classes.itemSlot}>{row.item.equipSlot}</span>
+                  {canUploadCharacterAssets && (
+                    <Link
+                      className={classes.uploadLink}
+                      to={`/upload?itemId=${encodeURIComponent(row.item.id)}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Upload
+                    </Link>
+                  )}
                 </summary>
 
                 {!row.item.characterDisplay ? (

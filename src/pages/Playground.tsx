@@ -16,7 +16,8 @@ import { EquipSlot } from "../config/equipSlots";
 import EquipSlotSelector from "../components/EquipSlotSelector";
 import {
   derivePoseFromEquipment,
-  getEquipmentPartsForSlot
+  getEquipmentPartsForSlot,
+  weaponOccupiesBothHands
 } from "../utils/equipmentPose";
 import { useLoadEquipmentFromUrlHash } from "../hooks/useLoadEquipmentFromUrlHash";
 import { useRandomizeCharacter } from "../hooks/useRandomizeCharacter";
@@ -88,10 +89,7 @@ const Playground = () => {
 
   const addEquipmentPart = (newPart: ConfigPartEquipment) => {
     cleanCharacterUrlHash();
-    const is2hWeapon =
-      newPart.pose === "2h" ||
-      newPart.pose === "2h crossbow" ||
-      newPart.twoHanded === true;
+    const newUsesBothHands = weaponOccupiesBothHands(newPart);
     const otherHand: EquipSlot | null =
       newPart.equipSlot === "main-hand"
         ? "off-hand"
@@ -102,8 +100,10 @@ const Playground = () => {
     setEquippedItems((prev) => {
       const withoutSameSlot = prev.filter((part) => {
         if (part.equipSlot === newPart.equipSlot) return false;
-        if (is2hWeapon && otherHand && part.equipSlot === otherHand)
-          return false;
+        if (!otherHand || part.equipSlot !== otherHand) return true;
+        // 2h (either hand) cannot coexist with anything in the opposite slot.
+        if (newUsesBothHands) return false;
+        if (weaponOccupiesBothHands(part)) return false;
         return true;
       });
       const merged = mergeEquipmentPartWithConfig(newPart, allEquipmentItems);

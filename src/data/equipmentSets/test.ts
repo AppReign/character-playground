@@ -11,7 +11,7 @@ export const testEquipment = [
     characterDisplay: {
       perSex: {
         male: {
-          "1h left crossbow": [
+          "1h mainhand crossbow": [
             {
               filename: "M0_ONEHCBLSLING",
               layer: EQUIPMENT.MAINHAND.ONE_HANDED.CROSSBOW.UNDER
@@ -57,7 +57,7 @@ export const testEquipment = [
     characterDisplay: {
       perSex: {
         male: {
-          "1h right crossbow": [
+          "1h offhand crossbow": [
             {
               filename: "M0_ONEHCBRSLING",
               layer: EQUIPMENT.OFFHAND.ONE_HANDED.CROSSBOW.UNDER

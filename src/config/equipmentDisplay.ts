@@ -134,8 +134,8 @@ export function resolveEquipmentImagesForHandPose(
     return out;
   }
 
-  // Chest: stance-dependent overlays for both hands (second bucket may use complementary L/R
-  // when both slots share the same `1h left` / `1h right` catalog pose).
+  // Chest: stance-dependent overlays for both hands (second bucket may use complementary
+  // mainhand/offhand idle when both slots share the same one-hand catalog pose).
   pushUniqueLayers(buckets.all, seen, out);
   pushUniqueLayers(buckets[pose.mainHandPose] ?? buckets[def], seen, out);
   pushUniqueLayers(

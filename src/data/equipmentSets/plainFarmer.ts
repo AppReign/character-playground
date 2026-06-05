@@ -39,13 +39,13 @@ export const plainFarmerEquipment = [
                 layer: EQUIPMENT.CHEST.BODY.UNTUCKED
               }
             ],
-            "1h left": [
+            "1h mainhand": [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_MAINHAND_1H",
                 layer: EQUIPMENT.CHEST.OFFHAND.ONE_HANDED
               }
             ],
-            "1h right": [
+            "1h offhand": [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_OFFHAND_1H",
                 layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
@@ -71,25 +71,25 @@ export const plainFarmerEquipment = [
                 layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED
               }
             ],
-            "1h left crossbow": [
+            "1h mainhand crossbow": [
               {
                 filename: PF + "M02_ONEHCBLARM",
                 layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED
               }
             ],
-            "1h right crossbow": [
+            "1h offhand crossbow": [
               {
                 filename: PF + "M02_ONEHCBRARM",
                 layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED
               }
             ],
-            "throwing left": [
+            "throwing mainhand": [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_OFFHAND_THROWING",
                 layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
               }
             ],
-            "throwing right": [
+            "throwing offhand": [
               {
                 filename: PF + "M02_PLAINFARMER_CHEST_MAINHAND_THROWING",
                 layer: EQUIPMENT.CHEST.MAINHAND.THROWING

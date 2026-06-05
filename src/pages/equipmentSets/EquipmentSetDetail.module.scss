@@ -1,7 +1,7 @@
 .loading {
   padding: 2rem 0;
   text-align: center;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.78);
   font-size: 0.95rem;
 }
 
@@ -23,7 +23,7 @@
 .meta {
   margin: 0 0 1rem;
   font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.75);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -32,7 +32,7 @@
 
 .code {
   font-size: 0.85em;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .dot {
@@ -65,7 +65,7 @@
 
 .summaryMuted {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.68);
 }
 
 .itemList {
@@ -100,6 +100,21 @@
   }
 }
 
+.uploadLink {
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #9ec5ff;
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+
+  &:hover {
+    background: rgba(158, 197, 255, 0.12);
+    text-decoration: underline;
+  }
+}
+
 .itemTitle {
   display: flex;
   align-items: center;
@@ -129,7 +144,7 @@
   }
 
   &[data-status="na"] {
-    color: rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 0.65);
     background: rgba(255, 255, 255, 0.06);
   }
 }
@@ -145,7 +160,7 @@
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .noLayers,
@@ -154,7 +169,7 @@
   padding: 0 0.85rem 0.85rem;
   font-size: 0.88rem;
   line-height: 1.45;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .warn {
@@ -176,7 +191,7 @@
   }
 
   th {
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.68);
     font-weight: 600;
     font-size: 0.72rem;
     text-transform: uppercase;
@@ -224,7 +239,7 @@
 }
 
 .usageCell {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .usageLine {
@@ -243,15 +258,15 @@
 .usageSex {
   text-transform: uppercase;
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.58);
 }
 
 .usagePose {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .usageLayer {
   font-family: ui-monospace, monospace;
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.72);
 }

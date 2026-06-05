@@ -6,51 +6,46 @@ export type EquipmentHandPose = {
   offHandPose: Pose;
 };
 
-/**
- * Idle poses when a slot is empty. Must match art: chest `"1h left"` = OFFHAND-side layers,
- * `"1h right"` = MAINHAND-side layers. Many main-hand weapons (incl. 1h crossbows) use **left**
- * stance keys (`1h left`, `1h left crossbow`); off-hand gear often uses **right** keys — so main
- * idle is left, off idle is right (not the reverse).
- */
-const DEFAULT_MAIN_HAND_EMPTY: Pose = "1h left";
-const DEFAULT_OFF_HAND_EMPTY: Pose = "1h right";
+const DEFAULT_MAIN_HAND_EMPTY: Pose = "1h mainhand";
+const DEFAULT_OFF_HAND_EMPTY: Pose = "1h offhand";
 
-export type BodySide = "left" | "right" | "both";
+export type HandPoseBucket = "mainhand" | "offhand" | "both";
 
-/** Which side of the body a pose key drives for base arms + chest buckets (see `partsBaseArms`). */
-export function anatomicalSideOfPose(p: Pose): BodySide {
+/** Which hand bucket a pose key drives for base arms + chest overlays. */
+export function handPoseBucketOf(p: Pose): HandPoseBucket {
   if (p === "2h" || p === "2h crossbow") return "both";
   if (
-    p === "1h left" ||
-    p === "1h left crossbow" ||
-    p === "throwing left"
+    p === "1h mainhand" ||
+    p === "1h mainhand crossbow" ||
+    p === "throwing mainhand"
   ) {
-    return "left";
+    return "mainhand";
   }
   if (
-    p === "1h right" ||
-    p === "1h right crossbow" ||
-    p === "throwing right"
+    p === "1h offhand" ||
+    p === "1h offhand crossbow" ||
+    p === "throwing offhand"
   ) {
-    return "right";
+    return "offhand";
   }
-  return "left";
+  return "mainhand";
 }
 
 export function isTwoHandedWeaponPose(pose: Pose): boolean {
   return pose === "2h" || pose === "2h crossbow";
 }
 
-/** Base `partsBaseArms` entries for neutral one-hand stances — one pose key per side (L vs R). */
-export function isLeftRightIdlePair(p: Pose): boolean {
-  return p === "1h left" || p === "1h right";
+/** Base `partsBaseArms` entries for neutral one-hand stances — one pose key per hand. */
+export function isOneHandIdlePair(p: Pose): boolean {
+  return p === "1h mainhand" || p === "1h offhand";
 }
 
-export function complementaryLeftRightIdle(p: Pose): Pose {
-  return p === "1h left" ? "1h right" : "1h left";
+export function complementaryOneHandIdle(p: Pose): Pose {
+  return p === "1h mainhand" ? "1h offhand" : "1h mainhand";
 }
 
-function weaponOccupiesBothHands(part: ConfigPartEquipment): boolean {
+/** True when the item’s pose or flag indicates it uses both hands (2h / 2h crossbow). */
+export function weaponOccupiesBothHands(part: ConfigPartEquipment): boolean {
   return (
     part.twoHanded === true || isTwoHandedWeaponPose(part.pose)
   );
@@ -58,8 +53,8 @@ function weaponOccupiesBothHands(part: ConfigPartEquipment): boolean {
 
 /**
  * Derives the pose pair used for registry hand resolution from currently equipped weapons.
- * Empty main → {@link DEFAULT_MAIN_HAND_EMPTY} (`1h left`); empty off → {@link DEFAULT_OFF_HAND_EMPTY}
- * (`1h right`). A two-handed main-hand weapon mirrors its pose into the off slot when empty.
+ * Empty main → `1h mainhand`; empty off → `1h offhand`. A two-handed main-hand weapon mirrors
+ * its pose into the off slot when empty.
  */
 export function derivePoseFromEquipment(
   equipment: ConfigPartEquipment[]
@@ -85,22 +80,22 @@ export function derivePoseFromEquipment(
 
 /**
  * Two pose keys for {@link getBaseCharacterAssets}. If both slot poses map to the **same**
- * anatomical side (same-hand collision), the second bundle uses the opposite idle (`1h left` ↔
- * `1h right`). Item resolution still uses truthful {@link derivePoseFromEquipment}.
+ * hand bucket (collision), the second bundle uses the opposite idle (`1h mainhand` ↔ `1h offhand`).
+ * Item resolution still uses truthful {@link derivePoseFromEquipment}.
  */
 export function deriveBaseArmBundlePoses(
   pose: EquipmentHandPose
 ): readonly [Pose, Pose] {
   const { mainHandPose, offHandPose } = pose;
-  const sm = anatomicalSideOfPose(mainHandPose);
-  const so = anatomicalSideOfPose(offHandPose);
+  const sm = handPoseBucketOf(mainHandPose);
+  const so = handPoseBucketOf(offHandPose);
 
   if (sm === "both" || so === "both") {
     return [mainHandPose, offHandPose];
   }
 
   if (sm === so) {
-    return [mainHandPose, sm === "left" ? "1h right" : "1h left"];
+    return [mainHandPose, complementaryOneHandIdle(mainHandPose)];
   }
 
   return [mainHandPose, offHandPose];
@@ -108,8 +103,8 @@ export function deriveBaseArmBundlePoses(
 
 /** Second stance bucket for chest armor (paired with `mainHandPose` first push). */
 export function deriveChestSecondaryBucketPose(pose: EquipmentHandPose): Pose {
-  const sm = anatomicalSideOfPose(pose.mainHandPose);
-  const so = anatomicalSideOfPose(pose.offHandPose);
+  const sm = handPoseBucketOf(pose.mainHandPose);
+  const so = handPoseBucketOf(pose.offHandPose);
 
   if (sm === "both" || so === "both") {
     return pose.offHandPose;
@@ -119,7 +114,7 @@ export function deriveChestSecondaryBucketPose(pose: EquipmentHandPose): Pose {
     return pose.offHandPose;
   }
 
-  return sm === "left" ? "1h right" : "1h left";
+  return complementaryOneHandIdle(pose.mainHandPose);
 }
 
 /**

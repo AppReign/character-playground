@@ -57,7 +57,7 @@ export const partsBaseBody: ConfigPart[] = [
 export const partsBaseArms: ConfigPart[] = [
   {
     name: "ARMS 1H LEFT MALE 01",
-    pose: '1h left',
+    pose: '1h mainhand',
     images: [
       {
         filename: "M01_ONEHLARM",
@@ -71,7 +71,7 @@ export const partsBaseArms: ConfigPart[] = [
   },
   {
     name: "ARMS 1H RIGHT MALE 01",
-    pose: '1h right',
+    pose: '1h offhand',
     images: [
       {
         filename: "M01_ONEHRARM",
@@ -125,7 +125,7 @@ export const partsBaseArms: ConfigPart[] = [
   },
   {
     name: "1H CROSSBOW LEFT ARM",
-    pose: '1h left crossbow',
+    pose: '1h mainhand crossbow',
     images: [
       {
         filename: "M01_ONEHCBLARM",
@@ -135,7 +135,7 @@ export const partsBaseArms: ConfigPart[] = [
   },
   {
     name: "1H CROSSBOW RIGHT ARM",
-    pose: '1h right crossbow',
+    pose: '1h offhand crossbow',
     images: [
       {
         filename: "M01_ONEHCBRARM",
@@ -145,7 +145,7 @@ export const partsBaseArms: ConfigPart[] = [
   },
   {
     name: "ARMS 1H LEFT THROWING MALE 01",
-    pose: 'throwing left',
+    pose: 'throwing mainhand',
     images: [
       {
         filename: "M01_ARMLTHROWING",
@@ -155,7 +155,7 @@ export const partsBaseArms: ConfigPart[] = [
   },
   {
     name: "ARMS 1H RIGHT THROWING MALE 01",
-    pose: 'throwing right',
+    pose: 'throwing offhand',
     images: [
       {
         filename: "M01_ARMRTHROWING",

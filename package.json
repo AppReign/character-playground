@@ -1,8 +1,10 @@
 {
   "name": "character-playground",
   "version": "0.1.0",
-  "homepage": "https://dragonsofthevoid.com/",
+  "homepage": "https://creator.dragonsofthevoid.com",
   "dependencies": {
+    "axios": "^0.27.2",
+    "oidc-client": "^1.11.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@types/jest": "^24.9.1",
@@ -20,9 +22,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:stage": "env-cmd -f .env.staging react-scripts start",
     "build": "react-scripts build",
+    "build:stage": "env-cmd -f .env.staging react-scripts build",
     "generate:equipment": "node scripts/generate-equipment-sets.mjs",
     "deploy": "npm run build && gh-pages -d build",
+    "deploy:stage": "npm run build:stage && gh-pages -d build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -43,6 +48,15 @@
   },
   "devDependencies": {
     "@types/classnames": "^2.2.10",
+    "env-cmd": "^10.1.0",
     "gh-pages": "^2.2.0"
+  },
+  "overrides": {
+    "ajv-keywords@5": {
+      "ajv": "^8.17.1"
+    },
+    "schema-utils@4": {
+      "ajv": "^8.17.1"
+    }
   }
 }

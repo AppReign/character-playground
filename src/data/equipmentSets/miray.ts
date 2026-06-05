@@ -54,13 +54,13 @@ export const mirayEquipment = [
                 layer: EQUIPMENT.CHEST.BODY.TUCKED
               }
             ],
-            "1h left": [
+            "1h mainhand": [
               {
                 filename: MR + "M03_ONEHLARM",
                 layer: EQUIPMENT.CHEST.OFFHAND.ONE_HANDED
               }
             ],
-            "1h right": [
+            "1h offhand": [
               {
                 filename: MR + "M03_ONEHRARM",
                 layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
@@ -86,25 +86,25 @@ export const mirayEquipment = [
                 layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED
               }
             ],
-            "1h left crossbow": [
+            "1h mainhand crossbow": [
               {
                 filename: MR + "M03_ONEHCBLARM",
                 layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED
               }
             ],
-            "1h right crossbow": [
+            "1h offhand crossbow": [
               {
                 filename: MR + "M03_ONEHCBRARM",
                 layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED
               }
             ],
-            "throwing left": [
+            "throwing mainhand": [
               {
                 filename: MR + "M03_ARMLTHROWING",
                 layer: EQUIPMENT.CHEST.OFFHAND.THROWING
               }
             ],
-            "throwing right": [
+            "throwing offhand": [
               {
                 filename: MR + "M03_ARMRTHROWING",
                 layer: EQUIPMENT.CHEST.MAINHAND.THROWING
@@ -149,7 +149,7 @@ export const mirayEquipment = [
       characterDisplay: {
         perSex: {
           male: {
-            "1h left": [
+            "1h mainhand": [
               {
                 filename: MR + "M03_ONEHLWEAPON",
                 layer: EQUIPMENT.MAINHAND.ONE_HANDED.DEFAULT.UNDER

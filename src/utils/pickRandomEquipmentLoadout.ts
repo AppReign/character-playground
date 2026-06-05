@@ -1,7 +1,10 @@
 import allEquipmentItems from "../config/allEquipmentItems";
 import { EquipSlot } from "../config/equipSlots";
 import { ConfigPartEquipment } from "../interfaces/Config";
-import { getEquipmentPartsForSlot, isTwoHandedWeaponPose } from "./equipmentPose";
+import {
+  getEquipmentPartsForSlot,
+  weaponOccupiesBothHands
+} from "./equipmentPose";
 
 const ARMOR_SLOTS: EquipSlot[] = ["helm", "chest", "pants", "boots"];
 
@@ -52,14 +55,12 @@ export function pickRandomEquipmentLoadout(
   const main = pickOrSkip(mainCandidates, p);
   if (main) picks.push(main);
 
-  const mainIs2h =
-    main != null &&
-    (main.twoHanded === true || isTwoHandedWeaponPose(main.pose));
+  const mainIs2h = main != null && weaponOccupiesBothHands(main);
 
   if (!mainIs2h) {
     const offCandidates = catalog.filter((part) => part.equipSlot === "off-hand");
     const offSafe = offCandidates.filter(
-      (part) => !isTwoHandedWeaponPose(part.pose)
+      (part) => !weaponOccupiesBothHands(part)
     );
     const pool =
       main != null

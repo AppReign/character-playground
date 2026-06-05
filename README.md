@@ -31,6 +31,8 @@ cd character
 npm install
 ```
 
+If `npm install` fails with an `ERESOLVE` / TypeScript peer conflict, the repo includes `.npmrc` with `legacy-peer-deps=true` — run install again from the project root.
+
 ### 3) Run the app
 
 ```bash

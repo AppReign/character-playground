@@ -1,3 +1,4 @@
+import { FULL_POSE_KEYS } from "../config/characterPoseCatalog";
 import { EquipSlot } from "../config/equipSlots";
 import { ZIndexLayerKey } from "../layers/zIndex";
 
@@ -7,21 +8,12 @@ export type CharacterDisplayImageRow = {
   layer: ZIndexLayerKey;
 };
 
-export type Pose =
-  | "all"
-  | "2h"
-  | "2h crossbow"
-  | "1h right"
-  | "1h left crossbow"
-  | "1h right crossbow"
-  | "throwing right"
-  | "1h left"
-  | "throwing left";
+export type Pose = (typeof FULL_POSE_KEYS)[number];
 
 export type CharacterSex = "male" | "female";
 
 /**
- * `male` carries exactly one pose bucket (e.g. only `"1h left"` or only `"all"`).
+ * `male` carries exactly one pose bucket (e.g. only `"1h mainhand"` or only `"all"`).
  * Used for `main-hand` / `off-hand` registry items.
  */
 export type MaleCharacterDisplaySinglePoseBucket = {

@@ -36,13 +36,13 @@ export const conquerorEquipment = [
               layer: EQUIPMENT.CHEST.BODY.UNTUCKED
             }
           ],
-          "1h left": [
+          "1h mainhand": [
             {
               filename: CQ + "M05_ONEHLARM",
               layer: EQUIPMENT.CHEST.OFFHAND.ONE_HANDED
             }
           ],
-          "1h right": [
+          "1h offhand": [
             {
               filename: CQ + "M05_ONEHRARM",
               layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
@@ -68,25 +68,25 @@ export const conquerorEquipment = [
               layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED
             }
           ],
-          "1h left crossbow": [
+          "1h mainhand crossbow": [
             {
               filename: CQ + "M05_ONEHCBLARM",
               layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED
             }
           ],
-          "1h right crossbow": [
+          "1h offhand crossbow": [
             {
               filename: CQ + "M05_ONEHCBRARM",
               layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED
             }
           ],
-          "throwing left": [
+          "throwing mainhand": [
             {
               filename: CQ + "M05_ARMLTHROWING",
               layer: EQUIPMENT.CHEST.OFFHAND.THROWING
             }
           ],
-          "throwing right": [
+          "throwing offhand": [
             {
               filename: CQ + "M05_ARMRTHROWING",
               layer: EQUIPMENT.CHEST.MAINHAND.THROWING
@@ -152,7 +152,7 @@ export const conquerorEquipment = [
     characterDisplay: {
       perSex: {
         male: {
-          "1h left": [
+          "1h mainhand": [
             {
               filename: CQ + "M05_ONEHLWEAPON",
               layer: EQUIPMENT.MAINHAND.ONE_HANDED.DEFAULT.UNDER

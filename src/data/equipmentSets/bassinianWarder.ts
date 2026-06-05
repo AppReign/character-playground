@@ -39,13 +39,13 @@ export const bassinianWarderEquipment = [
               layer: EQUIPMENT.CHEST.BODY.TUCKED
             }
           ],
-          "1h left": [
+          "1h mainhand": [
             {
               filename: BW + "M04_ONEHLARM",
               layer: EQUIPMENT.CHEST.OFFHAND.ONE_HANDED
             }
           ],
-          "1h right": [
+          "1h offhand": [
             {
               filename: BW + "M04_ONEHRARM",
               layer: EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
@@ -71,25 +71,25 @@ export const bassinianWarderEquipment = [
               layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED
             }
           ],
-          "1h left crossbow": [
+          "1h mainhand crossbow": [
             {
               filename: BW + "M04_ONEHCBLARM",
               layer: EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED
             }
           ],
-          "1h right crossbow": [
+          "1h offhand crossbow": [
             {
               filename: BW + "M04_ONEHCBRARM",
               layer: EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED
             }
           ],
-          "throwing left": [
+          "throwing mainhand": [
             {
               filename: BW + "M04_ARMLTHROWING",
               layer: EQUIPMENT.CHEST.OFFHAND.THROWING
             }
           ],
-          "throwing right": [
+          "throwing offhand": [
             {
               filename: BW + "M04_ARMRTHROWING",
               layer: EQUIPMENT.CHEST.MAINHAND.THROWING
@@ -150,7 +150,7 @@ export const bassinianWarderEquipment = [
     characterDisplay: {
       perSex: {
         male: {
-          "1h left": [
+          "1h mainhand": [
             {
               filename: BW + "M04_ONEHLWEAPON",
               layer: EQUIPMENT.MAINHAND.ONE_HANDED.DEFAULT.UNDER,
