@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 
 import EquipmentImagePreview from "../../components/EquipmentImagePreview";
 import CdnCheckProgress from "../../components/CdnCheckProgress";
-import CdnStatusBadge, { type CdnBadgeStatus } from "../../components/CdnStatusBadge";
+import CdnStatusBadge from "../../components/CdnStatusBadge";
 import { useAuth } from "../../context/AuthContext";
 import { useCreatorEquipment } from "../../context/CreatorEquipmentContext";
 
@@ -15,9 +15,11 @@ import { buildEquipmentCdnUrl } from "../../utils/apiCharacterDisplay";
 import type { CreatorEquipmentItem } from "../../utils/apiCharacterDisplay";
 import { formatEquipSetLabel } from "../../utils/formatEquipSetLabel";
 import {
-  useEquipmentValidation,
-  type CdnRollupStatus
-} from "./equipmentValidationContext";
+  equipmentItemCdnTitle,
+  equipmentSetBanner,
+  toCdnBadgeStatus
+} from "../../utils/cdnStatusPresentation";
+import { useEquipmentValidation } from "./equipmentValidationContext";
 import type { ItemValidationResult } from "../../utils/validateEquipmentBundle";
 import progressClasses from "../../components/CdnCheckProgress.module.scss";
 import classes from "./EquipmentSetDetail.module.scss";
@@ -57,71 +59,13 @@ function groupRefsByFilename(
 function previewUrlForRef(
   cdnBaseUrl: string,
   apiItem: CreatorEquipmentItem | undefined,
-  ref: ExtractedImageRef
+  ref: ExtractedImageRef,
+  cdnCacheBust?: string
 ): string {
   if (apiItem && cdnBaseUrl) {
-    return buildEquipmentCdnUrl(apiItem, ref, cdnBaseUrl);
+    return buildEquipmentCdnUrl(apiItem, ref, cdnBaseUrl, cdnCacheBust);
   }
   return getCharacterPartPublicUrl(ref.filename);
-}
-
-function badgeStatusForItem(status: CdnRollupStatus): CdnBadgeStatus {
-  switch (status) {
-    case "ok":
-      return "ok";
-    case "pending":
-      return "pending";
-    case "issue":
-      return "issue";
-    case "error":
-    case "na":
-    default:
-      return "error";
-  }
-}
-
-function titleForItemStatus(status: CdnRollupStatus): string {
-  switch (status) {
-    case "ok":
-      return "All sprites on CDN";
-    case "pending":
-      return "Checking CDN sprites";
-    case "issue":
-      return "Missing or empty characterDisplay";
-    case "error":
-    case "na":
-    default:
-      return "Some sprites missing on CDN";
-  }
-}
-
-function badgeForSetStatus(status: CdnRollupStatus): {
-  label: string;
-  dataStatus: "pending" | "ok" | "error" | "issue";
-} {
-  switch (status) {
-    case "ok":
-      return {
-        label: "All items have every sprite on CDN",
-        dataStatus: "ok"
-      };
-    case "pending":
-      return {
-        label: "Checking CDN sprites…",
-        dataStatus: "pending"
-      };
-    case "issue":
-      return {
-        label: "Some items missing valid characterDisplay",
-        dataStatus: "issue"
-      };
-    case "error":
-    default:
-      return {
-        label: "Some items missing sprites on CDN",
-        dataStatus: "error"
-      };
-  }
 }
 
 const EquipmentSetDetail = () => {
@@ -129,7 +73,7 @@ const EquipmentSetDetail = () => {
   const { equipSetId } = useParams<{ equipSetId: string }>();
   const { validationBySet, bundles, getItemCdnStatus, getSetCdnStatus, cdnCheckProgress } =
     useEquipmentValidation();
-  const { cdnBaseUrl, itemById, loading, error, refresh } = useCreatorEquipment();
+  const { cdnBaseUrl, cdnCacheBust, itemById, loading, error, refresh } = useCreatorEquipment();
 
   const bundle = useMemo(
     () => bundles.find((b) => b.equipSet === equipSetId),
@@ -152,7 +96,7 @@ const EquipmentSetDetail = () => {
   }
 
   const v = validation;
-  const setBadge = badgeForSetStatus(getSetCdnStatus(bundle.equipSet));
+  const setBadge = equipmentSetBanner(getSetCdnStatus(bundle.equipSet));
   const showProgress =
     cdnCheckProgress.checked < cdnCheckProgress.total;
 
@@ -220,8 +164,8 @@ const EquipmentSetDetail = () => {
                 <summary className={classes.itemSummary}>
                   <span className={classes.itemTitle}>
                     <CdnStatusBadge
-                      status={badgeStatusForItem(itemStatus)}
-                      title={titleForItemStatus(itemStatus)}
+                      status={toCdnBadgeStatus(itemStatus) ?? "error"}
+                      title={equipmentItemCdnTitle(itemStatus)}
                       size="md"
                     />
                     <span className={classes.itemName}>{row.item.name}</span>
@@ -230,7 +174,7 @@ const EquipmentSetDetail = () => {
                   {canUploadCharacterAssets && (
                     <Link
                       className={classes.uploadLink}
-                      to={`/upload?itemId=${encodeURIComponent(row.item.id)}`}
+                      to={`/upload/equipment?itemId=${encodeURIComponent(row.item.id)}`}
                       onClick={(e) => e.stopPropagation()}
                     >
                       Upload
@@ -260,7 +204,7 @@ const EquipmentSetDetail = () => {
                         const refs = refsByFile.get(filename) ?? [];
                         const ref = refs[0];
                         const url = ref
-                          ? previewUrlForRef(cdnBaseUrl, apiItem, ref)
+                          ? previewUrlForRef(cdnBaseUrl, apiItem, ref, cdnCacheBust)
                           : getCharacterPartPublicUrl(filename);
                         return (
                           <tr key={filename}>

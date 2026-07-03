@@ -1,94 +1,46 @@
 import React, { useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-import EquipmentImagePreview from "../components/EquipmentImagePreview";
-import { layerPresetsForEquipSlot } from "../config/uploadLayerPresets";
-import { poseKeysForEquipSlot } from "../config/characterPoseCatalog";
-import { useCreatorEquipment } from "../context/CreatorEquipmentContext";
+import {
+  BASE_PART_COLORS,
+  BASE_PART_TYPES,
+  buildBasePartFilename,
+  buildBasePartObjectKey,
+  layerSlugsForBasePart,
+  poseKeysForBasePartType,
+  type BasePartColor,
+  type BasePartType
+} from "../config/basePartUploadCatalog";
+import { useCharacterBaseSets } from "../context/CharacterBaseSetsContext";
 import { useCharacterCdnCacheBust } from "../context/CharacterCdnCacheBustContext";
-import type { ItemEquip } from "../interfaces/Config";
+import BasePartImagePreview from "./characterSets/BasePartImagePreview";
 import {
-  uploadEquipmentCharacterImage,
-  EquipmentCharacterImageUploadResult
-} from "../services/equipmentCharacterImageApi";
-import {
-  buildEquipmentUploadCdnUrl,
-  buildEquipmentUploadFilename,
-  buildEquipmentUploadObjectKey
-} from "../utils/equipmentUploadPaths";
+  uploadCharacterBasePartImage,
+  type CharacterBasePartImageUploadResult
+} from "../services/characterBasePartImageApi";
+import { buildCharacterBasePartCdnUrl } from "../utils/characterBasePartCdnUrl";
 import classes from "./EquipmentCharacterUpload.module.scss";
 
 const GENDERS = ["male", "female"] as const;
 
-const EquipmentCharacterUpload = () => {
-  const { bundles, refresh, itemById, cdnBaseUrl, cdnCacheBust } = useCreatorEquipment();
+const CharacterBasePartUpload = () => {
+  const { cdnBaseUrl, cdnCacheBust } = useCharacterBaseSets();
   const { bumpCdnCacheBust, withCdnCacheBust } = useCharacterCdnCacheBust();
-  const [searchParams] = useSearchParams();
-  const initialItemId = searchParams.get("itemId") ?? "";
-
-  const [itemId, setItemId] = useState(initialItemId);
-
-  React.useEffect(() => {
-    if (initialItemId) {
-      setItemId(initialItemId);
-    }
-  }, [initialItemId]);
   const [gender, setGender] = useState<"male" | "female">("male");
+  const [color, setColor] = useState<BasePartColor>("white");
+  const [partType, setPartType] = useState<BasePartType>("head");
   const [poseKey, setPoseKey] = useState("all");
   const [layer, setLayer] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<EquipmentCharacterImageUploadResult | null>(null);
+  const [result, setResult] = useState<CharacterBasePartImageUploadResult | null>(null);
 
-  const creatorItem = itemId ? itemById[itemId] : undefined;
-
-  const selectedItem = useMemo((): ItemEquip | undefined => {
-    if (!itemId) return undefined;
-    for (const bundle of bundles) {
-      const item = bundle.items.find((i) => i.id === itemId);
-      if (item) return item;
-    }
-    return undefined;
-  }, [itemId, bundles]);
-
-  const expectedObjectKey = useMemo(() => {
-    if (!creatorItem || !layer) return null;
-    return buildEquipmentUploadObjectKey(creatorItem, gender, poseKey, layer);
-  }, [creatorItem, gender, poseKey, layer]);
-
-  const expectedFilename = useMemo(() => {
-    if (!creatorItem || !layer) return null;
-    return buildEquipmentUploadFilename(
-      creatorItem.normalizedItemId,
-      gender,
-      poseKey,
-      layer
-    );
-  }, [creatorItem, gender, poseKey, layer]);
-
-  const expectedCdnUrl = useMemo(() => {
-    if (!creatorItem || !layer) return null;
-    return buildEquipmentUploadCdnUrl(
-      creatorItem,
-      gender,
-      poseKey,
-      layer,
-      cdnBaseUrl,
-      cdnCacheBust
-    );
-  }, [creatorItem, gender, poseKey, layer, cdnBaseUrl, cdnCacheBust]);
-
-  const previewUrl = expectedCdnUrl;
-
-  const poseOptions = useMemo(
-    () => (selectedItem ? poseKeysForEquipSlot(selectedItem.equipSlot) : ["all"]),
-    [selectedItem]
-  );
+  const poseOptions = useMemo(() => poseKeysForBasePartType(partType), [partType]);
 
   const layerOptions = useMemo(
-    () => (selectedItem ? layerPresetsForEquipSlot(selectedItem.equipSlot) : []),
-    [selectedItem]
+    () => layerSlugsForBasePart(partType, poseKey),
+    [partType, poseKey]
   );
 
   React.useEffect(() => {
@@ -103,25 +55,37 @@ const EquipmentCharacterUpload = () => {
     }
   }, [layerOptions, layer]);
 
-  const allItems = useMemo(
-    () =>
-      bundles.flatMap((b) =>
-        b.items.map((item) => ({ item, equipSet: b.equipSet }))
-      ),
-    [bundles]
-  );
+  const expectedObjectKey = useMemo(() => {
+    if (!layer) return null;
+    return buildBasePartObjectKey(gender, color, partType, poseKey, layer);
+  }, [gender, color, partType, poseKey, layer]);
+
+  const expectedFilename = useMemo(() => {
+    if (!layer) return null;
+    return buildBasePartFilename(gender, color, poseKey, layer);
+  }, [gender, color, poseKey, layer]);
+
+  const expectedCdnUrl = useMemo(() => {
+    if (!expectedFilename) return null;
+    return buildCharacterBasePartCdnUrl({
+      gender,
+      color,
+      partType,
+      filename: expectedFilename,
+      cdnBaseUrl,
+      cacheBust: cdnCacheBust
+    });
+  }, [gender, color, partType, expectedFilename, cdnBaseUrl, cdnCacheBust]);
+
+  const previewUrl = expectedCdnUrl;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setResult(null);
 
-    if (!itemId.trim()) {
-      setError("Item ID is required.");
-      return;
-    }
     if (!layer.trim()) {
-      setError("Layer is required (base, over, or under per slot rules).");
+      setError("Layer is required.");
       return;
     }
     if (!file) {
@@ -135,16 +99,16 @@ const EquipmentCharacterUpload = () => {
 
     setSubmitting(true);
     try {
-      const uploadResult = await uploadEquipmentCharacterImage({
-        itemId: itemId.trim(),
+      const uploadResult = await uploadCharacterBasePartImage({
         gender,
+        color,
+        partType,
         poseKey,
         layer: layer.trim(),
         file
       });
       setResult(uploadResult);
       bumpCdnCacheBust();
-      await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -155,38 +119,15 @@ const EquipmentCharacterUpload = () => {
   return (
     <div className={classes.page}>
       <header className={classes.header}>
-        <h1 className={classes.title}>Upload equipment assets</h1>
+        <h1 className={classes.title}>Upload base body sprites</h1>
         <p className={classes.lead}>
-          Uploads to DigitalOcean Spaces via the game API. Use the admin VPN. Copy{" "}
-          <code>suggestedEntry</code> into <code>equipment_data.json</code> after merge (PR bot
-          planned).
+          Uploads creator base parts (head, body, arms) to DigitalOcean Spaces via the game
+          API. Use the admin VPN. Filenames are derived from gender, color, pose, and layer — no
+          manual naming.
         </p>
       </header>
 
       <form className={classes.form} onSubmit={onSubmit}>
-        <label className={classes.field}>
-          <span className={classes.label}>Item</span>
-          <select
-            className={classes.select}
-            value={itemId}
-            onChange={(ev) => setItemId(ev.target.value)}
-          >
-            <option value="">Select item…</option>
-            {allItems.map(({ item, equipSet }) => (
-              <option key={item.id} value={item.id}>
-                {item.name} ({item.id}) — {equipSet}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {selectedItem && (
-          <p className={classes.hint}>
-            Slot: <code>{selectedItem.equipSlot}</code>
-            {selectedItem.id !== itemId && null}
-          </p>
-        )}
-
         <div className={classes.row}>
           <label className={classes.field}>
             <span className={classes.label}>Gender</span>
@@ -204,6 +145,38 @@ const EquipmentCharacterUpload = () => {
           </label>
 
           <label className={classes.field}>
+            <span className={classes.label}>Skin color</span>
+            <select
+              className={classes.select}
+              value={color}
+              onChange={(ev) => setColor(ev.target.value as BasePartColor)}
+            >
+              {BASE_PART_COLORS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <label className={classes.field}>
+          <span className={classes.label}>Part type</span>
+          <select
+            className={classes.select}
+            value={partType}
+            onChange={(ev) => setPartType(ev.target.value as BasePartType)}
+          >
+            {BASE_PART_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div className={classes.row}>
+          <label className={classes.field}>
             <span className={classes.label}>Pose</span>
             <select
               className={classes.select}
@@ -217,24 +190,24 @@ const EquipmentCharacterUpload = () => {
               ))}
             </select>
           </label>
-        </div>
 
-        <label className={classes.field}>
-          <span className={classes.label}>Layer</span>
-          <select
-            className={classes.select}
-            value={layer}
-            onChange={(ev) => setLayer(ev.target.value)}
-            disabled={!layerOptions.length}
-          >
-            {!layerOptions.length && <option value="">Select item first…</option>}
-            {layerOptions.map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
-        </label>
+          <label className={classes.field}>
+            <span className={classes.label}>Layer</span>
+            <select
+              className={classes.select}
+              value={layer}
+              onChange={(ev) => setLayer(ev.target.value)}
+              disabled={!layerOptions.length}
+            >
+              {!layerOptions.length && <option value="">No layers for this pose</option>}
+              {layerOptions.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
 
         {expectedObjectKey && (
           <p className={classes.hint}>
@@ -245,7 +218,7 @@ const EquipmentCharacterUpload = () => {
         {previewUrl && expectedFilename && (
           <div className={classes.existingPreview}>
             <span className={classes.label}>Current on CDN</span>
-            <EquipmentImagePreview
+            <BasePartImagePreview
               url={previewUrl}
               label={expectedFilename}
               className={classes.uploadPreview}
@@ -309,14 +282,12 @@ const EquipmentCharacterUpload = () => {
       )}
 
       <p className={classes.back}>
-        <Link to="/upload/base-parts">← Base body upload</Link>
-        {" · "}
-        <Link to="/equipment-sets">Equipment sets</Link>
+        <Link to="/upload/equipment">Equipment upload →</Link>
       </p>
     </div>
   );
 };
 
-EquipmentCharacterUpload.displayName = "EquipmentCharacterUpload";
+CharacterBasePartUpload.displayName = "CharacterBasePartUpload";
 
-export default EquipmentCharacterUpload;
+export default CharacterBasePartUpload;

@@ -7,8 +7,9 @@ import { CharacterActions } from "../components/CharacterActions";
 import classes from "../styles/App.module.scss";
 import characterClasses from "../styles/components/Character.module.scss";
 import { ConfigPart, ConfigPartEquipment, CharacterSex } from "../interfaces/Config";
-import { getBaseCharacterAssets } from "../config/partsBase";
+import { DEFAULT_CHARACTER_BASE_COLOR } from "../config/characterBaseSets";
 import { EquipSlot } from "../config/equipSlots";
+import { useCharacterBaseSets } from "../context/CharacterBaseSetsContext";
 import EquipSlotSelector from "../components/EquipSlotSelector";
 import {
   derivePoseFromEquipment,
@@ -21,11 +22,20 @@ import { useEquipmentCatalog } from "../hooks/useEquipmentCatalog";
 import { cleanCharacterUrlHash } from "../utils/cleanCharacterUrlHash";
 import { mergeEquipmentPartWithConfig } from "../utils/mergeEquipmentPartWithConfig";
 import { saveCharacterAsPng } from "../utils/saveCharacterImage";
+import { resolveBasePartsFromVariant } from "../utils/basePartsFromApi";
 import { resolveEquipmentImagesWithCdn } from "../utils/equipmentCatalog";
 
 const Playground = () => {
-  const { ready, loading, error, catalog, itemEquipById, itemById, cdnBaseUrl } =
+  const { ready, loading, error, catalog, itemEquipById, itemById, cdnBaseUrl, cdnCacheBust } =
     useEquipmentCatalog();
+  const {
+    ready: basePartsReady,
+    loading: basePartsLoading,
+    error: basePartsError,
+    bundle: basePartsBundle,
+    cdnBaseUrl: basePartsCdnBaseUrl,
+    cdnCacheBust: basePartsCdnCacheBust
+  } = useCharacterBaseSets();
   const [equippedItems, setEquippedItems] = useState<ConfigPartEquipment[]>([]);
   const [selectedEquipmentSlot, setSelectedEquipmentSlot] =
     useState<EquipSlot>("helm");
@@ -40,9 +50,17 @@ const Playground = () => {
     [equippedItems]
   );
 
+  const baseVariant = basePartsBundle[characterSex]?.[DEFAULT_CHARACTER_BASE_COLOR];
+
   const baseCharacterAssets = useMemo<ConfigPart[]>(
-    () => getBaseCharacterAssets(selectedPose),
-    [selectedPose]
+    () =>
+      resolveBasePartsFromVariant(
+        baseVariant,
+        selectedPose,
+        basePartsCdnBaseUrl || cdnBaseUrl,
+        basePartsCdnCacheBust || cdnCacheBust
+      ),
+    [baseVariant, selectedPose, basePartsCdnBaseUrl, cdnBaseUrl, basePartsCdnCacheBust, cdnCacheBust]
   );
 
   const equipmentPartsForSlot = useMemo(
@@ -62,7 +80,9 @@ const Playground = () => {
         itemById[key],
         selectedPose,
         characterSex,
-        cdnBaseUrl
+        cdnBaseUrl,
+        equippedItems,
+        cdnCacheBust
       );
       return {
         ...part,
@@ -75,7 +95,8 @@ const Playground = () => {
     characterSex,
     itemEquipById,
     itemById,
-    cdnBaseUrl
+    cdnBaseUrl,
+    cdnCacheBust
   ]);
 
   const removeEquipmentPart = (removedPart: ConfigPartEquipment) => {
@@ -92,6 +113,7 @@ const Playground = () => {
 
   const addEquipmentPart = (newPart: ConfigPartEquipment) => {
     cleanCharacterUrlHash();
+    const merged = mergeEquipmentPartWithConfig(newPart, catalog);
     const newUsesBothHands = weaponOccupiesBothHands(newPart);
     const otherHand: EquipSlot | null =
       newPart.equipSlot === "main-hand"
@@ -108,7 +130,6 @@ const Playground = () => {
         if (weaponOccupiesBothHands(part)) return false;
         return true;
       });
-      const merged = mergeEquipmentPartWithConfig(newPart, catalog);
       return [...withoutSameSlot, merged];
     });
   };
@@ -130,18 +151,20 @@ const Playground = () => {
 
   const backgroundImageUrl = `${process.env.PUBLIC_URL || ""}/character_parts/BACKGROUND.png`;
 
-  if (!ready || loading) {
+  if (!ready || !basePartsReady || loading || basePartsLoading) {
     return (
       <div className={classes.playgroundRoot}>
-        <p className={classes.loadingMessage}>Loading equipment from API…</p>
+        <p className={classes.loadingMessage}>Loading character data from API…</p>
       </div>
     );
   }
 
-  if (error) {
+  if (error || basePartsError) {
     return (
       <div className={classes.playgroundRoot}>
-        <p className={classes.loadingMessage}>Equipment unavailable: {error}</p>
+        <p className={classes.loadingMessage}>
+          Character data unavailable: {error || basePartsError}
+        </p>
       </div>
     );
   }

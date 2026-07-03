@@ -13,7 +13,9 @@ class AuthService {
       client_id: config.oidcClientId,
       redirect_uri: config.oidcRedirectUri,
       response_type: "id_token token",
-      scope: "openid profile email api1.read api1.write"
+      scope: "openid profile email api1.read api1.write",
+      automaticSilentRenew: false,
+      monitorSession: false
     };
     this.userManager = new UserManager(settings);
   }

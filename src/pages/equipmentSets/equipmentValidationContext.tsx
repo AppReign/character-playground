@@ -11,6 +11,7 @@ import { useCreatorEquipment } from "../../context/CreatorEquipmentContext";
 import type { EquipmentSetBundle } from "../../types/equipmentSet";
 import { buildEquipmentCdnUrl } from "../../utils/apiCharacterDisplay";
 import { checkCdnImageUrls } from "../../utils/checkCdnImage";
+import { rollupCdnStatusFromCounts, type CdnRollupStatus } from "../../utils/cdnRollupStatus";
 import { extractRequiredCharacterImages } from "../../utils/extractCharacterDisplayImages";
 import type { BundleValidationResult } from "../../utils/validateEquipmentBundle";
 import { validateEquipmentBundle } from "../../utils/validateEquipmentBundle";
@@ -18,8 +19,6 @@ import { validateEquipmentBundle } from "../../utils/validateEquipmentBundle";
 export type ValidationMap = Record<string, BundleValidationResult>;
 
 export type EquipmentImageLoadState = "loading" | "ok" | "error";
-
-export type CdnRollupStatus = "pending" | "ok" | "error" | "issue" | "na";
 
 type ItemCdnPlan = {
   itemId: string;
@@ -50,7 +49,8 @@ const ValidationContext = createContext<ValidationContextValue>({
 function buildItemCdnPlans(
   bundles: readonly EquipmentSetBundle[],
   itemById: Record<string, { id: string; itemSetSegment: string; normalizedItemId: string }>,
-  cdnBaseUrl: string
+  cdnBaseUrl: string,
+  cdnCacheBust?: string
 ): ItemCdnPlan[] {
   const plans: ItemCdnPlan[] = [];
   for (const bundle of bundles) {
@@ -60,7 +60,7 @@ function buildItemCdnPlans(
       const refs = extractRequiredCharacterImages(item);
       const urls = new Set<string>();
       for (const ref of refs) {
-        urls.add(buildEquipmentCdnUrl(creatorItem, ref, cdnBaseUrl));
+        urls.add(buildEquipmentCdnUrl(creatorItem, ref, cdnBaseUrl, cdnCacheBust));
       }
       plans.push({
         itemId: item.id,
@@ -72,25 +72,14 @@ function buildItemCdnPlans(
   return plans;
 }
 
-function rollupFromCounts(
-  total: number,
-  ok: number,
-  error: number,
-  pending: number
-): CdnRollupStatus {
-  if (total === 0) return "na";
-  if (pending > 0) return "pending";
-  if (error > 0) return "error";
-  if (ok === total) return "ok";
-  return "error";
-}
+export { type CdnRollupStatus } from "../../utils/cdnRollupStatus";
 
 export function EquipmentValidationProvider({
   children
 }: {
   children: React.ReactNode;
 }) {
-  const { ready, bundles, itemById, cdnBaseUrl } = useCreatorEquipment();
+  const { ready, bundles, itemById, cdnBaseUrl, cdnCacheBust } = useCreatorEquipment();
   const [cdnChecking, setCdnChecking] = useState(false);
   const [urlStatus, setUrlStatus] = useState<Record<string, EquipmentImageLoadState>>({});
   const checkGeneration = useRef(0);
@@ -106,8 +95,8 @@ export function EquipmentValidationProvider({
 
   const itemPlans = useMemo(() => {
     if (!ready || !cdnBaseUrl) return [];
-    return buildItemCdnPlans(bundles, itemById, cdnBaseUrl);
-  }, [ready, bundles, itemById, cdnBaseUrl]);
+    return buildItemCdnPlans(bundles, itemById, cdnBaseUrl, cdnCacheBust);
+  }, [ready, bundles, itemById, cdnBaseUrl, cdnCacheBust]);
 
   const itemUrlsById = useMemo(() => {
     const map: Record<string, string[]> = {};
@@ -189,7 +178,7 @@ export function EquipmentValidationProvider({
         else if (status === "error") error++;
         else pending++;
       }
-      return rollupFromCounts(urls.length, ok, error, pending);
+      return rollupCdnStatusFromCounts(urls.length, ok, error, pending);
     };
   }, [validationBySet, itemUrlsById, urlStatus]);
 

@@ -2,41 +2,14 @@ import React, { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 
 import CdnCheckProgress from "../../components/CdnCheckProgress";
-import CdnStatusBadge, { type CdnBadgeStatus } from "../../components/CdnStatusBadge";
+import CdnStatusBadge from "../../components/CdnStatusBadge";
 import { formatEquipSetLabel } from "../../utils/formatEquipSetLabel";
 import {
-  useEquipmentValidation,
-  type CdnRollupStatus
-} from "./equipmentValidationContext";
+  equipmentSetCdnTitle,
+  toCdnBadgeStatus
+} from "../../utils/cdnStatusPresentation";
+import { useEquipmentValidation } from "./equipmentValidationContext";
 import classes from "./EquipmentSetSidebar.module.scss";
-
-function badgeStatusForSet(status: CdnRollupStatus): CdnBadgeStatus {
-  switch (status) {
-    case "ok":
-      return "ok";
-    case "pending":
-      return "pending";
-    case "issue":
-      return "issue";
-    case "error":
-    default:
-      return "error";
-  }
-}
-
-function titleForSetStatus(status: CdnRollupStatus): string {
-  switch (status) {
-    case "ok":
-      return "All items have every sprite on CDN";
-    case "pending":
-      return "Checking CDN sprites";
-    case "issue":
-      return "Some items are missing characterDisplay data";
-    case "error":
-    default:
-      return "Some items are missing sprites on CDN";
-  }
-}
 
 const EquipmentSetSidebar = () => {
   const {
@@ -86,8 +59,8 @@ const EquipmentSetSidebar = () => {
                     {formatEquipSetLabel(bundle.equipSet)}
                   </span>
                   <CdnStatusBadge
-                    status={badgeStatusForSet(setStatus)}
-                    title={titleForSetStatus(setStatus)}
+                    status={toCdnBadgeStatus(setStatus) ?? "error"}
+                    title={equipmentSetCdnTitle(setStatus)}
                   />
                 </NavLink>
               </li>

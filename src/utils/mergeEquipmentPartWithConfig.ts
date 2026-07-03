@@ -8,7 +8,6 @@ function filenamesMatch(
   return (
     catalogFilename === incomingFilename ||
     catalogFilename.endsWith("/" + incomingFilename) ||
-    incomingFilename.endsWith("/" + catalogFilename) ||
     incomingFilename.endsWith("/" + catalogFilename)
   );
 }
