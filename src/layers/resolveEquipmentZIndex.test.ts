@@ -1,4 +1,4 @@
-import { resolveEquipmentZIndex } from "./resolveEquipmentZIndex";
+import { resolveEquipmentZIndex, chestLayerForHandBucket } from "./resolveEquipmentZIndex";
 import { zIndexValue } from "./zIndex";
 import { EQUIPMENT } from "./equipmentLayer";
 
@@ -21,6 +21,40 @@ describe("resolveEquipmentZIndex", () => {
         layer: "base"
       })
     ).toBe(zIndexValue(EQUIPMENT.CHEST.MAINHAND.TWO_HANDED));
+  });
+
+  it("maps chest pose keys to the matching hand overlay", () => {
+    expect(chestLayerForHandBucket("mainhand", "1h mainhand")).toBe(
+      EQUIPMENT.CHEST.MAINHAND.ONE_HANDED
+    );
+    expect(chestLayerForHandBucket("offhand", "1h offhand")).toBe(
+      EQUIPMENT.CHEST.OFFHAND.ONE_HANDED
+    );
+    expect(chestLayerForHandBucket("mainhand", "throwing mainhand")).toBe(
+      EQUIPMENT.CHEST.MAINHAND.THROWING
+    );
+    expect(chestLayerForHandBucket("offhand", "throwing offhand")).toBe(
+      EQUIPMENT.CHEST.OFFHAND.THROWING
+    );
+  });
+
+  it("uses chestHandSide for composed chest buckets", () => {
+    expect(
+      resolveEquipmentZIndex({
+        equipSlot: "chest",
+        poseKey: "throwing mainhand",
+        layer: "base",
+        chestHandSide: "mainhand"
+      })
+    ).toBe(zIndexValue(EQUIPMENT.CHEST.MAINHAND.THROWING));
+    expect(
+      resolveEquipmentZIndex({
+        equipSlot: "chest",
+        poseKey: "1h offhand",
+        layer: "base",
+        chestHandSide: "offhand"
+      })
+    ).toBe(zIndexValue(EQUIPMENT.CHEST.OFFHAND.ONE_HANDED));
   });
 
   it("resolves main-hand crossbow over/under at all pose", () => {

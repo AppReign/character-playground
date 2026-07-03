@@ -1,5 +1,8 @@
 import type { EquipSlot } from "../config/equipSlots";
-import { getCharacterCdnBaseUrl } from "../config/characterCdn";
+import {
+  appendCharacterCdnCacheBust,
+  getCharacterCdnBaseUrl
+} from "../config/characterCdn";
 import type { ItemEquip } from "../interfaces/Config";
 import type { ApiCharacterDisplay } from "../services/creatorEquipmentApi";
 import { isVanityItem, type ApiItemEquipment } from "../types/apiItemEquipment";
@@ -70,36 +73,6 @@ export function apiItemToCreatorItem(item: ApiItemEquipment): CreatorEquipmentIt
   };
 }
 
-export function extractRefsFromApiCharacterDisplay(
-  display: ApiCharacterDisplay | null | undefined
-): ExtractedImageRef[] {
-  if (!display) return [];
-  const out: ExtractedImageRef[] = [];
-  pushApiBuckets(out, display.male, "male");
-  pushApiBuckets(out, display.female, "female");
-  return out;
-}
-
-function pushApiBuckets(
-  out: ExtractedImageRef[],
-  buckets: Record<string, { filename: string; layer: string }[]> | undefined,
-  sex: "male" | "female"
-): void {
-  if (!buckets) return;
-  for (const poseKey of Object.keys(buckets)) {
-    const rows = buckets[poseKey];
-    if (!rows?.length) continue;
-    for (const row of rows) {
-      out.push({
-        filename: row.filename,
-        poseKey,
-        sex,
-        layer: String(row.layer)
-      });
-    }
-  }
-}
-
 export function resolveItemSetSegment(item: ApiItemEquipment): string {
   const itemSetIds = item.itemSetIds;
   const vanitySet = item.vanity?.vanitySet;
@@ -122,7 +95,8 @@ function normalizeItemSetSegment(segment: string): string {
 export function buildEquipmentCdnUrl(
   item: Pick<CreatorEquipmentItem, "itemSetSegment" | "normalizedItemId">,
   ref: Pick<ExtractedImageRef, "filename" | "sex">,
-  cdnBaseUrl: string = getCharacterCdnBaseUrl()
+  cdnBaseUrl: string = getCharacterCdnBaseUrl(),
+  cacheBust?: string
 ): string {
   const base = cdnBaseUrl.replace(/\/+$/, "");
   const filename = ref.filename.endsWith(".png") ? ref.filename : `${ref.filename}.png`;
@@ -133,5 +107,5 @@ export function buildEquipmentCdnUrl(
     ref.sex,
     filename
   ].join("/");
-  return `${base}/${objectKey}`;
+  return appendCharacterCdnCacheBust(`${base}/${objectKey}`, cacheBust);
 }

@@ -11,10 +11,12 @@ import type { EquipmentSetBundle } from "../types/equipmentSet";
 import type { EquipSlot } from "./equipSlots";
 import {
   resolveEquipmentZIndex,
-  supportsHandWeaponZIndex
+  supportsHandWeaponZIndex,
+  type ChestHandSide
 } from "../layers/resolveEquipmentZIndex";
 import {
-  deriveChestSecondaryBucketPose,
+  deriveChestWeaponStances,
+  handPoseBucketOf,
   EquipmentHandPose
 } from "../utils/equipmentPose";
 
@@ -95,7 +97,8 @@ function toConfigImage(
   item: ItemEquip,
   poseKey: Pose,
   row: CharacterDisplayImageRow,
-  handPose?: EquipmentHandPose
+  handPose?: EquipmentHandPose,
+  chestHandSide?: ChestHandSide
 ): { filename: string; zIndex: number } | null {
   if (
     isHandWeaponSlot(item.equipSlot) &&
@@ -121,7 +124,8 @@ function toConfigImage(
       layer: row.layer,
       equipType: item.equipType,
       twoHanded: item.twoHanded,
-      handPose: resolvedHandPose
+      handPose: resolvedHandPose,
+      chestHandSide
     })
   };
 }
@@ -132,17 +136,49 @@ function pushBucketLayers(
   layers: CharacterDisplayImageRow[] | undefined,
   handPose: EquipmentHandPose | undefined,
   seen: Set<string>,
-  out: { filename: string; zIndex: number }[]
+  out: { filename: string; zIndex: number }[],
+  chestHandSide?: ChestHandSide
 ): void {
   if (!layers?.length) return;
   for (const row of layers) {
-    const image = toConfigImage(item, bucketPoseKey, row, handPose);
+    const image = toConfigImage(
+      item,
+      bucketPoseKey,
+      row,
+      handPose,
+      chestHandSide
+    );
     if (!image) continue;
     const key = `${image.filename}|${image.zIndex}`;
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(image);
   }
+}
+
+function chestHandSideForWeaponStance(weaponStancePose: Pose): ChestHandSide {
+  const bucket = handPoseBucketOf(weaponStancePose);
+  return bucket === "offhand" ? "offhand" : "mainhand";
+}
+
+function pushChestWeaponStanceLayers(
+  item: ItemEquip,
+  weaponStancePose: Pose,
+  buckets: Partial<Record<Pose, CharacterDisplayImageRow[]>>,
+  def: Pose,
+  handPose: EquipmentHandPose,
+  seen: Set<string>,
+  out: { filename: string; zIndex: number }[]
+): void {
+  pushBucketLayers(
+    item,
+    weaponStancePose,
+    buckets[weaponStancePose] ?? buckets[def],
+    handPose,
+    seen,
+    out,
+    chestHandSideForWeaponStance(weaponStancePose)
+  );
 }
 
 function allBucketImages(
@@ -163,13 +199,14 @@ function allBucketImages(
 
 /**
  * Resolves drawable rows for the current hand pose.
- * — **Chest** composes `all` plus main- and off-hand stance buckets (arm variants).
+ * — **Chest** composes `all` plus main- and off-hand stance buckets (weapon or idle).
  * — **Helm / pants / boots / gloves / main-hand / off-hand** use only the `all` bucket.
  */
 export function resolveEquipmentImagesForHandPose(
   item: ItemEquip,
   pose: EquipmentHandPose,
-  sex: CharacterSex
+  sex: CharacterSex,
+  equipped: ConfigPartEquipment[] = []
 ): ConfigImage[] {
   if (!item.characterDisplay) {
     return [];
@@ -192,22 +229,9 @@ export function resolveEquipmentImagesForHandPose(
   const out: { filename: string; zIndex: number }[] = [];
 
   pushBucketLayers(item, "all", buckets.all, pose, seen, out);
-  pushBucketLayers(
-    item,
-    pose.mainHandPose,
-    buckets[pose.mainHandPose] ?? buckets[def],
-    pose,
-    seen,
-    out
-  );
-  pushBucketLayers(
-    item,
-    deriveChestSecondaryBucketPose(pose),
-    buckets[deriveChestSecondaryBucketPose(pose)] ?? buckets[def],
-    pose,
-    seen,
-    out
-  );
+  for (const weaponStance of deriveChestWeaponStances(equipped)) {
+    pushChestWeaponStanceLayers(item, weaponStance, buckets, def, pose, seen, out);
+  }
   return out;
 }
 

@@ -6,14 +6,29 @@
 </head>
 <body>
 <script src="js/oidc-client.min.js"></script>
+<script src="js/oidcCallbackSettings.js"></script>
 <script>
-    var mgr = new Oidc.UserManager({userStore: new Oidc.WebStorageStateStore()});
-    mgr.signinRedirectCallback().then(function () {
-        window.location.href = './';
-    }).catch(function (err) {
-        console.error(err);
-        document.body.textContent = 'Sign-in failed. Return to the app and try again.';
-    });
+(function () {
+    var mgr = new Oidc.UserManager(getOidcCallbackSettings(Oidc));
+
+    mgr.signinRedirectCallback()
+        .then(function () {
+            window.location.replace("./");
+        })
+        .catch(function (err) {
+            console.error(err);
+            var detail = err && err.error ? err.error : err && err.message ? err.message : String(err);
+            if (detail === "login_required") {
+                Object.keys(window.localStorage).forEach(function (key) {
+                    if (key.indexOf("oidc.") === 0) {
+                        window.localStorage.removeItem(key);
+                    }
+                });
+            }
+            document.body.textContent =
+                "Sign-in failed (" + detail + "). Return to the app and try again.";
+        });
+})();
 </script>
 </body>
 </html>

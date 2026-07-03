@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import partsBase from "../config/partsBase";
 import { ConfigPart, ConfigPartEquipment } from "../interfaces/Config";
 import { mergeEquipmentPartWithConfig } from "../utils/mergeEquipmentPartWithConfig";
 
-const basePartNames = new Set(partsBase.map((p) => p.name));
+function isEquipmentPart(part: ConfigPart): part is ConfigPartEquipment {
+  return "equipSlot" in part && Boolean((part as ConfigPartEquipment).equipSlot);
+}
 
 type SetEquippedItems = React.Dispatch<
   React.SetStateAction<ConfigPartEquipment[]>
@@ -25,10 +26,16 @@ export function useLoadEquipmentFromUrlHash(
     const characterBase64 = window.location.hash.split("#")[1];
     if (!characterBase64) return;
 
-    const savedParts: ConfigPart[] = JSON.parse(atob(characterBase64));
+    let savedParts: ConfigPart[];
+    try {
+      savedParts = JSON.parse(atob(characterBase64));
+    } catch {
+      return;
+    }
+
     setChanging(true);
     setTimeout(() => setChanging(false), 500);
-    const savedEquipment = savedParts.filter((p) => !basePartNames.has(p.name));
+    const savedEquipment = savedParts.filter(isEquipmentPart);
     setEquippedItems(
       savedEquipment.map((p) => mergeEquipmentPartWithConfig(p, catalog))
     );

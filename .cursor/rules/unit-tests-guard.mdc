@@ -1,0 +1,35 @@
+---
+description: Run tests before finishing; confirm with the user before changing behavior that breaks existing unit tests
+alwaysApply: true
+---
+
+# Unit tests — do not break without human approval
+
+## Before you finish a task
+
+1. Run the relevant test suite (character repo: `npm test -- --watchAll=false`).
+2. If you changed pose, layering, equipment display, or base-part resolution, run at least:
+   - `npm test -- --watchAll=false --testPathPattern=equipmentPose`
+   - `npm test -- --watchAll=false --testPathPattern=basePartsFromApi`
+
+## If existing tests fail
+
+**Stop and confirm with the user before “fixing” by changing product behavior.**
+
+- Do **not** delete, weaken, or rewrite assertions to make tests pass unless the user explicitly asked to change that behavior.
+- Do **not** change expected poses, z-index resolution, or base-arm bundle rules to match a new implementation without the user signing off.
+- Report: which tests failed, what behavior they lock in, and whether the failure indicates a **regression** or an **intentional spec change**.
+
+## Allowed without asking
+
+- Fix the **implementation** so tests pass when the tests encode agreed behavior (bug fixes).
+- Add **new** tests for new behavior the user requested.
+- Update tests when the user **explicitly** asks to change the spec (quote their request in the commit/PR message).
+
+## Locked behavior (examples — see `equipmentPose.test.ts`, `basePartsFromApi.test.ts`)
+
+- Hand weapons with catalog `pose: "all"` must map to real **body stances** (`1h mainhand`, `2h`, …), never `"all"`.
+- 1H main-hand + empty off-hand → base bundles `1h mainhand` + `1h offhand` (main-hand base arms must render).
+- `twoHanded: true` main-hand → `2h` on both hands when off-hand is empty.
+
+When a task would violate these, **ask first**.

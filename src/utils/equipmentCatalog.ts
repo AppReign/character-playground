@@ -10,14 +10,16 @@ export function attachCdnToConfigImages(
   images: ConfigImage[],
   creatorItem: CreatorEquipmentItem,
   sex: CharacterSex,
-  cdnBaseUrl: string
+  cdnBaseUrl: string,
+  cdnCacheBust?: string
 ): ConfigImage[] {
   return images.map((image) => ({
     ...image,
     src: buildEquipmentCdnUrl(
       creatorItem,
       { filename: image.filename, sex },
-      cdnBaseUrl
+      cdnBaseUrl,
+      cdnCacheBust
     )
   }));
 }
@@ -27,17 +29,20 @@ export function resolveEquipmentImagesWithCdn(
   creatorItem: CreatorEquipmentItem,
   pose: EquipmentHandPose,
   sex: CharacterSex,
-  cdnBaseUrl: string
+  cdnBaseUrl: string,
+  equipped: ConfigPartEquipment[] = [],
+  cdnCacheBust?: string
 ): ConfigImage[] {
-  const images = resolveEquipmentImagesForHandPose(item, pose, sex);
-  return attachCdnToConfigImages(images, creatorItem, sex, cdnBaseUrl);
+  const images = resolveEquipmentImagesForHandPose(item, pose, sex, equipped);
+  return attachCdnToConfigImages(images, creatorItem, sex, cdnBaseUrl, cdnCacheBust);
 }
 
 export function catalogWithCdnUrls(
   catalog: ConfigPartEquipment[],
   itemById: Record<string, CreatorEquipmentItem>,
   cdnBaseUrl: string,
-  sex: CharacterSex = "male"
+  sex: CharacterSex = "male",
+  cdnCacheBust?: string
 ): ConfigPartEquipment[] {
   return catalog.map((part) => {
     const key = part.equipmentRegistryKey;
@@ -47,7 +52,13 @@ export function catalogWithCdnUrls(
     }
     return {
       ...part,
-      images: attachCdnToConfigImages(part.images, creatorItem, sex, cdnBaseUrl)
+      images: attachCdnToConfigImages(
+        part.images,
+        creatorItem,
+        sex,
+        cdnBaseUrl,
+        cdnCacheBust
+      )
     };
   });
 }

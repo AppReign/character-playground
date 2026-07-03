@@ -1,10 +1,12 @@
 import type { EquipSlot } from "../config/equipSlots";
 import type { Pose } from "../interfaces/Config";
-import type { EquipmentHandPose } from "../utils/equipmentPose";
+import { handPoseBucketOf, type EquipmentHandPose } from "../utils/equipmentPose";
 import { EQUIPMENT } from "./equipmentLayer";
 import { CharacterStackLayer, normalizeStackLayer } from "./characterStackLayer";
 import { WeaponCategory, weaponCategory } from "./weaponCategory";
 import { ZIndexLayerKey, zIndexValue } from "./zIndex";
+
+export type ChestHandSide = "mainhand" | "offhand";
 
 export type ResolveEquipmentZIndexInput = {
   equipSlot: EquipSlot | string;
@@ -14,20 +16,43 @@ export type ResolveEquipmentZIndexInput = {
   twoHanded?: boolean;
   /** Required for `gloves` at render time. */
   handPose?: EquipmentHandPose;
+  /**
+   * Chest stance buckets: which hand slot this row occupies in the composed stack.
+   * Main-hand weapon pose → `mainhand`; off-hand / secondary bucket → `offhand`.
+   */
+  chestHandSide?: ChestHandSide;
 };
 
-/** Chest: one `base` sprite per pose bucket; pose key selects the overlay slot. */
-const CHEST_POSE_BASE_ZINDEX: Partial<Record<Pose, ZIndexLayerKey>> = {
-  all: EQUIPMENT.CHEST.BODY.UNTUCKED,
-  "1h mainhand": EQUIPMENT.CHEST.OFFHAND.ONE_HANDED,
-  "1h offhand": EQUIPMENT.CHEST.MAINHAND.ONE_HANDED,
-  "2h": EQUIPMENT.CHEST.MAINHAND.TWO_HANDED,
-  "2h crossbow": EQUIPMENT.CHEST.MAINHAND.CROSSBOW_TWO_HANDED,
-  "1h mainhand crossbow": EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED,
-  "1h offhand crossbow": EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED,
-  "throwing mainhand": EQUIPMENT.CHEST.OFFHAND.THROWING,
-  "throwing offhand": EQUIPMENT.CHEST.MAINHAND.THROWING
-};
+/** Chest overlay layer for one composed hand slot + stance bucket. */
+export function chestLayerForHandBucket(
+  handSide: ChestHandSide,
+  bucketPoseKey: Pose
+): ZIndexLayerKey {
+  const side =
+    handSide === "mainhand" ? EQUIPMENT.CHEST.MAINHAND : EQUIPMENT.CHEST.OFFHAND;
+
+  switch (bucketPoseKey) {
+    case "2h":
+      return side.TWO_HANDED;
+    case "2h crossbow":
+      return handSide === "mainhand"
+        ? EQUIPMENT.CHEST.MAINHAND.CROSSBOW_TWO_HANDED
+        : EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED;
+    case "1h mainhand crossbow":
+    case "1h offhand crossbow":
+      return side.CROSSBOW_ONE_HANDED;
+    case "throwing mainhand":
+    case "throwing offhand":
+      return side.THROWING;
+    case "1h mainhand":
+    case "1h offhand":
+      return side.ONE_HANDED;
+    default:
+      throw new Error(
+        `No chest overlay for handSide=${handSide} bucketPoseKey=${bucketPoseKey}`
+      );
+  }
+}
 
 const MAIN_HAND_ZINDEX: Record<
   WeaponCategory,
@@ -119,15 +144,23 @@ const GLOVES_ZINDEX: Record<
   }
 };
 
-function resolveChestZIndex(poseKey: Pose, layer: CharacterStackLayer): ZIndexLayerKey {
+function resolveChestZIndex(
+  poseKey: Pose,
+  layer: CharacterStackLayer,
+  chestHandSide?: ChestHandSide
+): ZIndexLayerKey {
   if (layer !== "base") {
     throw new Error(`Chest only supports layer=base, got ${layer}`);
   }
-  const key = CHEST_POSE_BASE_ZINDEX[poseKey];
-  if (!key) {
-    throw new Error(`No chest z-index for poseKey=${poseKey}`);
+  if (poseKey === "all") {
+    return EQUIPMENT.CHEST.BODY.UNTUCKED;
   }
-  return key;
+
+  const handSide: ChestHandSide =
+    chestHandSide ??
+    (handPoseBucketOf(poseKey) === "offhand" ? "offhand" : "mainhand");
+
+  return chestLayerForHandBucket(handSide, poseKey);
 }
 
 function resolveSimpleSlotZIndex(
@@ -215,7 +248,7 @@ export function resolveEquipmentZIndexKey(input: ResolveEquipmentZIndexInput): Z
   const slot = input.equipSlot;
 
   if (slot === "chest") {
-    return resolveChestZIndex(input.poseKey, layer);
+    return resolveChestZIndex(input.poseKey, layer, input.chestHandSide);
   }
 
   if (slot === "helm" || slot === "pants" || slot === "boots") {
@@ -250,20 +283,6 @@ export function resolveEquipmentZIndexKey(input: ResolveEquipmentZIndexInput): Z
   }
 
   throw new Error(`Unsupported equipSlot for z-index resolution: ${slot}`);
-}
-
-/** One or more z-index keys (gloves may expand to both hands later). */
-export function resolveEquipmentZIndexKeys(
-  input: ResolveEquipmentZIndexInput
-): ZIndexLayerKey[] {
-  const layer = normalizeStackLayer(String(input.layer));
-  if (!layer) {
-    throw new Error(`Invalid stack layer: ${input.layer}`);
-  }
-  if (input.equipSlot === "gloves" && input.handPose) {
-    return resolveGlovesZIndex(layer, input.handPose);
-  }
-  return [resolveEquipmentZIndexKey(input)];
 }
 
 export function resolveEquipmentZIndex(input: ResolveEquipmentZIndexInput): number {
