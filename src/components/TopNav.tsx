@@ -28,6 +28,14 @@ const TopNav = () => {
         >
           Equipment sets
         </NavLink>
+        <NavLink
+          to="/character-sets"
+          className={({ isActive }) =>
+            classnames(classes.link, isActive && classes.linkActive)
+          }
+        >
+          Character sets
+        </NavLink>
         {canUploadCharacterAssets && (
           <NavLink
             to="/upload"

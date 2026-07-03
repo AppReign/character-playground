@@ -18,12 +18,14 @@ import {
   type CreatorEquipmentItem
 } from "../utils/apiCharacterDisplay";
 import { useAuth } from "./AuthContext";
+import { useCharacterCdnCacheBust } from "./CharacterCdnCacheBustContext";
 
 type CreatorEquipmentContextValue = {
   ready: boolean;
   loading: boolean;
   error: string | null;
   cdnBaseUrl: string;
+  cdnCacheBust: string;
   items: CreatorEquipmentItem[];
   bundles: readonly EquipmentSetBundle[];
   itemById: Record<string, CreatorEquipmentItem>;
@@ -57,6 +59,7 @@ export function CreatorEquipmentProvider({
   children: React.ReactNode;
 }) {
   const { ready: authReady, authenticated } = useAuth();
+  const { cdnCacheBust } = useCharacterCdnCacheBust();
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,12 +116,13 @@ export function CreatorEquipmentProvider({
       loading,
       error,
       cdnBaseUrl: getCharacterCdnBaseUrl(),
+      cdnCacheBust,
       items,
       bundles,
       itemById,
       refresh: load
     };
-  }, [ready, loading, error, items, load]);
+  }, [ready, loading, error, items, load, cdnCacheBust]);
 
   return (
     <CreatorEquipmentContext.Provider value={value}>
