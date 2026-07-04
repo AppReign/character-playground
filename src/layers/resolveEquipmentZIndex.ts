@@ -23,35 +23,38 @@ export type ResolveEquipmentZIndexInput = {
   chestHandSide?: ChestHandSide;
 };
 
+/** Chest weapon-stance overlay z-index per composed stance pose key. */
+const CHEST_STANCE_ZINDEX: Partial<Record<Pose, ZIndexLayerKey>> = {
+  "1h mainhand": EQUIPMENT.CHEST.MAINHAND.ONE_HANDED,
+  "1h offhand": EQUIPMENT.CHEST.OFFHAND.ONE_HANDED,
+  "2h mainhand": EQUIPMENT.CHEST.MAINHAND.TWO_HANDED,
+  "2h offhand": EQUIPMENT.CHEST.OFFHAND.TWO_HANDED,
+  "2h mainhand crossbow": EQUIPMENT.CHEST.MAINHAND.CROSSBOW_TWO_HANDED,
+  "2h offhand crossbow": EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED,
+  "1h mainhand crossbow": EQUIPMENT.CHEST.MAINHAND.CROSSBOW_ONE_HANDED,
+  "1h offhand crossbow": EQUIPMENT.CHEST.OFFHAND.CROSSBOW_ONE_HANDED,
+  "throwing mainhand": EQUIPMENT.CHEST.MAINHAND.THROWING,
+  "throwing offhand": EQUIPMENT.CHEST.OFFHAND.THROWING
+};
+
 /** Chest overlay layer for one composed hand slot + stance bucket. */
 export function chestLayerForHandBucket(
   handSide: ChestHandSide,
   bucketPoseKey: Pose
 ): ZIndexLayerKey {
-  const side =
-    handSide === "mainhand" ? EQUIPMENT.CHEST.MAINHAND : EQUIPMENT.CHEST.OFFHAND;
-
-  switch (bucketPoseKey) {
-    case "2h":
-      return side.TWO_HANDED;
-    case "2h crossbow":
-      return handSide === "mainhand"
-        ? EQUIPMENT.CHEST.MAINHAND.CROSSBOW_TWO_HANDED
-        : EQUIPMENT.CHEST.OFFHAND.CROSSBOW_TWO_HANDED;
-    case "1h mainhand crossbow":
-    case "1h offhand crossbow":
-      return side.CROSSBOW_ONE_HANDED;
-    case "throwing mainhand":
-    case "throwing offhand":
-      return side.THROWING;
-    case "1h mainhand":
-    case "1h offhand":
-      return side.ONE_HANDED;
-    default:
-      throw new Error(
-        `No chest overlay for handSide=${handSide} bucketPoseKey=${bucketPoseKey}`
-      );
+  const key = CHEST_STANCE_ZINDEX[bucketPoseKey];
+  if (!key) {
+    throw new Error(
+      `No chest overlay for handSide=${handSide} bucketPoseKey=${bucketPoseKey}`
+    );
   }
+  const expectedSide = handPoseBucketOf(bucketPoseKey);
+  if (expectedSide !== handSide) {
+    throw new Error(
+      `Chest handSide=${handSide} does not match bucketPoseKey=${bucketPoseKey}`
+    );
+  }
+  return key;
 }
 
 const MAIN_HAND_ZINDEX: Record<
@@ -103,7 +106,7 @@ const GLOVES_ZINDEX: Record<
       under: EQUIPMENT.GLOVES.MAINHAND.DEFAULT.UNDER,
       over: EQUIPMENT.GLOVES.MAINHAND.DEFAULT.OVER
     },
-    "2h": {
+    "2h mainhand": {
       under: EQUIPMENT.GLOVES.MAINHAND.TWO_HANDED.UNDER,
       over: EQUIPMENT.GLOVES.MAINHAND.TWO_HANDED.OVER
     },
@@ -115,7 +118,7 @@ const GLOVES_ZINDEX: Record<
       under: EQUIPMENT.GLOVES.MAINHAND.THROWING.UNDER,
       over: EQUIPMENT.GLOVES.MAINHAND.THROWING.OVER
     },
-    "2h crossbow": {
+    "2h mainhand crossbow": {
       under: EQUIPMENT.GLOVES.MAINHAND.TWO_HANDED_CROSSBOW.UNDER,
       over: EQUIPMENT.GLOVES.MAINHAND.TWO_HANDED_CROSSBOW.OVER
     }
@@ -125,7 +128,7 @@ const GLOVES_ZINDEX: Record<
       under: EQUIPMENT.GLOVES.OFFHAND.DEFAULT.UNDER,
       over: EQUIPMENT.GLOVES.OFFHAND.DEFAULT.OVER
     },
-    "2h": {
+    "2h offhand": {
       under: EQUIPMENT.GLOVES.OFFHAND.TWO_HANDED.UNDER,
       over: EQUIPMENT.GLOVES.OFFHAND.TWO_HANDED.OVER
     },
@@ -137,7 +140,7 @@ const GLOVES_ZINDEX: Record<
       under: EQUIPMENT.GLOVES.OFFHAND.THROWING.UNDER,
       over: EQUIPMENT.GLOVES.OFFHAND.THROWING.OVER
     },
-    "2h crossbow": {
+    "2h offhand crossbow": {
       under: EQUIPMENT.GLOVES.OFFHAND.TWO_HANDED_CROSSBOW.UNDER,
       over: EQUIPMENT.GLOVES.OFFHAND.TWO_HANDED_CROSSBOW.OVER
     }

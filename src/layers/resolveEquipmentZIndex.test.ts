@@ -17,7 +17,7 @@ describe("resolveEquipmentZIndex", () => {
     expect(
       resolveEquipmentZIndex({
         equipSlot: "chest",
-        poseKey: "2h",
+        poseKey: "2h mainhand",
         layer: "base"
       })
     ).toBe(zIndexValue(EQUIPMENT.CHEST.MAINHAND.TWO_HANDED));
@@ -35,6 +35,12 @@ describe("resolveEquipmentZIndex", () => {
     );
     expect(chestLayerForHandBucket("offhand", "throwing offhand")).toBe(
       EQUIPMENT.CHEST.OFFHAND.THROWING
+    );
+    expect(chestLayerForHandBucket("mainhand", "2h mainhand")).toBe(
+      EQUIPMENT.CHEST.MAINHAND.TWO_HANDED
+    );
+    expect(chestLayerForHandBucket("offhand", "2h offhand")).toBe(
+      EQUIPMENT.CHEST.OFFHAND.TWO_HANDED
     );
   });
 
