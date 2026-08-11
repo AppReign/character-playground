@@ -176,15 +176,16 @@ export function deriveBaseArmBundlePoses(
 
 /**
  * Whether `p` should appear in the slot list for the current hand-derived pose.
- * Hand slots list every catalog option in that slot (native catalog `pose` may differ from the
- * default derived pose when nothing is equipped). Armor uses `"all"` or stance-specific poses.
+ * Hand slots and gloves list every catalog option in that slot (native catalog `pose` may
+ * differ from the default derived pose when nothing is equipped). Other armor uses `"all"`
+ * or stance-specific poses.
  */
 export function partMatchesPose(
   p: ConfigPartEquipment,
   slot: EquipSlot,
   pose: EquipmentHandPose
 ): boolean {
-  if (slot === "main-hand" || slot === "off-hand") {
+  if (slot === "main-hand" || slot === "off-hand" || slot === "gloves") {
     return true;
   }
   if (p.pose === "all") return true;

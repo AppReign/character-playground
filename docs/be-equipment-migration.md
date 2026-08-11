@@ -14,6 +14,8 @@ Two-handed stances use **side-specific** pose keys (aligned with dotv `Equipment
 - `2h mainhand`, `2h offhand`
 - `2h mainhand crossbow`, `2h offhand crossbow`
 
+**Gloves** use stance keys only (no `all`) — same idea as base `mainHand` / `offHand` parts. **Chest** still includes `all` for the torso layer plus stance overlays.
+
 Legacy shared keys `2h` and `2h crossbow` are **removed**. Delete any CDN assets uploaded under the old slugs (`…-2h-base-…`, `male-white-2h-under.png`, etc.) and re-upload under the new keys.
 
 See [`characterPoseCatalog.ts`](../src/config/characterPoseCatalog.ts) and dotv `docs/equipment-character-display-upload.md`.
