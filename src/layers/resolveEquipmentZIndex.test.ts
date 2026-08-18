@@ -104,14 +104,14 @@ describe("resolveEquipmentZIndex", () => {
     ).toBe(zIndexValue(EQUIPMENT.OFFHAND.ONE_HANDED.SHIELD.UNDER));
   });
 
-  it("resolves boots base only", () => {
+  it("resolves boots base to tucked (under pant legs) by default", () => {
     expect(
       resolveEquipmentZIndex({
         equipSlot: "boots",
         poseKey: "all",
         layer: "base"
       })
-    ).toBe(zIndexValue(EQUIPMENT.BOOTS.UNTUCKED));
+    ).toBe(zIndexValue(EQUIPMENT.BOOTS.TUCKED));
   });
 
   it("rejects non-base layer on chest", () => {
